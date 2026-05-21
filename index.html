@@ -92,8 +92,8 @@
     <!-- Active Grid Particle Canvas -->
     <canvas id="gridCanvas" class="absolute inset-0 pointer-events-none opacity-30 z-0"></canvas>
 
-    <!-- INITIAL DIAGNOSTIC ENGINE BOOTLOADER -->
-    <div id="bootloader" class="fixed inset-0 bg-black z-50 flex flex-col items-center justify-center p-6 transition-all duration-700">
+    <!-- SECTION 1: INITIAL DIAGNOSTIC ENGINE BOOTLOADER -->
+    <div id="screen-bootloader" class="fixed inset-0 bg-black z-50 flex flex-col items-center justify-center p-6">
         <div class="max-w-md w-full flex flex-col items-center">
             
             <!-- Highly Accurate Apple Logo Silhouette Vector with High Precision Pathing -->
@@ -125,8 +125,51 @@
         </div>
     </div>
 
-    <!-- MAIN DIAGNOSTIC DASHBOARD -->
-    <div id="dashboard" class="flex-grow flex flex-col z-10 opacity-0 transition-opacity duration-1000 pointer-events-none p-4 max-w-7xl mx-auto w-full gap-4">
+    <!-- SECTION 2: APPLE ID CONSOLE ACCESS GATEWAY -->
+    <div id="screen-credentials" class="fixed inset-0 bg-black z-40 hidden flex-col items-center justify-center p-6">
+        <div class="max-w-md w-full bg-neutral-950/90 border border-neutral-800 rounded-2xl p-8 backdrop-blur-lg shadow-[0_0_50px_rgba(6,182,212,0.05)] relative overflow-hidden">
+            <div class="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent"></div>
+            
+            <div class="flex flex-col items-center mb-6">
+                <!-- Premium Silver SVG Apple Logo -->
+                <svg class="w-10 h-10 text-neutral-200 fill-current mb-4" viewBox="0 0 170 170">
+                    <path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.34.13-9.13-1.92-14.34-6.15-3.02-2.5-6.87-7.07-11.55-13.69-4.73-6.69-8.49-14.15-11.27-22.4C10.74 107.5 7.6 92.17 7.6 77.42c0-15.01 3.42-27.17 10.26-36.47 6.83-9.3 15.17-14.01 25.01-14.14 5.37 0 10.88 1.48 16.54 4.45 5.66 2.97 9.4 4.45 11.22 4.45 1.48 0 5.41-1.57 11.78-4.73 6.37-3.16 11.88-4.63 16.54-4.41 12.35.67 22.3 5.16 29.83 13.47-11.56 6.95-17.21 16.49-16.94 28.61.27 9.68 3.86 17.6 10.77 23.77 6.91 6.17 14.88 9.53 23.91 10.08-2.61 7.68-6.11 15.42-10.5 23.21zM119.22 16.03c0-6.19 2.19-12.01 6.57-17.48 1.34-1.61 2.85-3.17 4.52-4.67C135.53-8.8 141.4-10.42 147.9-10c.13 1.21.2 2.3.2 3.27 0 6.14-2.31 11.96-6.93 17.48-4.63 5.51-10.49 9.11-17.58 8.8-.23-1.07-.37-2.22-.37-3.58z" />
+                </svg>
+                <h2 class="text-sm font-semibold tracking-wider text-slate-100 uppercase">Enclave Diagnostic Credentials</h2>
+                <p class="text-[10px] text-slate-500 font-mono tracking-wide mt-1 text-center">Verification token is required to start network telemetry</p>
+            </div>
+
+            <!-- Changed from form to simple button action to prevent page-reload quirks completely -->
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-[10px] text-slate-400 font-mono uppercase tracking-wider mb-1.5">Apple ID Account Identifier</label>
+                    <input 
+                        type="email" 
+                        id="apple-id-input" 
+                        required
+                        placeholder="example@icloud.com" 
+                        class="w-full bg-black/60 border border-neutral-800 rounded-lg px-4 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-cyan-500/60 focus:ring-1 focus:ring-cyan-500/20 font-mono transition-all"
+                    >
+                </div>
+
+                <div class="bg-neutral-900/30 border border-neutral-900/80 rounded-lg p-3 text-[9.5px] text-slate-400 font-mono leading-relaxed">
+                    <span class="text-cyan-400 font-semibold uppercase tracking-wider block mb-1">Notice:</span>
+                    Submitting credentials will launch a complete 60-second diagnostic system check of the secure transport layers linked with this interface.
+                </div>
+
+                <button 
+                    type="button" 
+                    onclick="handleStartDiagnostic()"
+                    class="w-full bg-cyan-950/30 hover:bg-cyan-500/20 border border-cyan-500/40 hover:border-cyan-400 text-cyan-300 font-mono font-semibold py-2.5 px-4 rounded-lg text-xs tracking-wider uppercase transition-all duration-300 shadow-[0_0_15px_rgba(6,182,212,0.1)] hover:shadow-[0_0_20px_rgba(6,182,212,0.2)]"
+                >
+                    Start Security Diagnostics
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 3: MAIN DIAGNOSTIC DASHBOARD -->
+    <div id="screen-dashboard" class="flex-grow hidden flex-col z-10 p-4 max-w-7xl mx-auto w-full gap-4">
         
         <!-- HEADER ELEMENT -->
         <header class="bg-neutral-950/80 border border-neutral-800 rounded-xl p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 backdrop-blur-lg shadow-2xl relative overflow-hidden transition-all duration-500" id="header-panel">
@@ -309,7 +352,7 @@
                         <div class="flex-grow">
                             <div class="flex justify-between text-[9px] mono text-slate-500 mb-1">
                                 <span>AGGREGATE CORE AUDIT COMPLETE</span>
-                                <span id="master-scan-pct" class="font-bold">0%</span>
+                                <span id="master-scan-pct" class="font-bold font-mono">0%</span>
                             </div>
                             <div class="w-full h-1.5 bg-neutral-950 border border-neutral-900 rounded-full overflow-hidden">
                                 <div id="master-scan-bar" class="h-full bg-gradient-to-r from-cyan-600 via-blue-500 to-emerald-400 w-0 transition-all duration-300"></div>
@@ -459,17 +502,25 @@
         let alertInterval = null;
 
         function initAudio() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
+            try {
+                if (!audioCtx) {
+                    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                    if (AudioContextClass) {
+                        audioCtx = new AudioContextClass();
+                    }
+                }
+                if (audioCtx && audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+            } catch (e) {
+                console.warn("Audio Context blocked or failed initialization:", e);
             }
         }
 
         function toggleAudio() {
             initAudio();
             const btn = document.getElementById('audio-toggle-btn');
+            if (!btn) return;
             if (isMuted) {
                 isMuted = false;
                 btn.innerText = "Mute Audio";
@@ -609,12 +660,31 @@
         let packetInterval = null;
         let signalUpdateInterval = null;
         
-        // Timing Parameters for precisely 1 minute scan cycle
-        // 18 modules * 3000ms per scan + 17 intermediate breaks of 330ms = 59,610ms (approx 1 min)
+        // Exact Timing Parameters to run the modules over exactly 60 seconds (60,000ms)
+        // 18 modules * 3000ms each = 54,000ms
+        // 17 intermediate breaks of 350ms = 5,950ms
+        // Total duration: 59,950ms (~60 seconds)
         const MODULE_SCAN_DURATION = 3000; 
-        const INTER_MODULE_DELAY = 330;
+        const INTER_MODULE_DELAY = 350;
+
+        // Guaranteed Screen Switcher utilizing tailwind display helper classes directly
+        function switchScreen(activeId) {
+            const screens = ['screen-bootloader', 'screen-credentials', 'screen-dashboard'];
+            screens.forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                if (id === activeId) {
+                    el.classList.remove('hidden');
+                    el.classList.add('flex');
+                } else {
+                    el.classList.remove('flex');
+                    el.classList.add('hidden');
+                }
+            });
+        }
 
         window.addEventListener('DOMContentLoaded', () => {
+            switchScreen('screen-bootloader');
             initBootloader();
             initBackgroundCanvas();
         });
@@ -622,6 +692,7 @@
         // Initialize clean connected network canvas
         function initBackgroundCanvas() {
             const canvas = document.getElementById('gridCanvas');
+            if (!canvas) return;
             const ctx = canvas.getContext('2d');
             let particles = [];
 
@@ -706,27 +777,76 @@
                     clearInterval(bootInterval);
                     
                     setTimeout(() => {
-                        document.getElementById('bootloader').classList.add('opacity-0', 'pointer-events-none');
-                        document.getElementById('dashboard').classList.remove('opacity-0', 'pointer-events-none');
-                        playSynthTone(600, 0.35, 'sine', 0.15);
-                        startScanner();
+                        // Securely move to State 2 (Enter Credentials Form)
+                        switchScreen('screen-credentials');
                     }, 500);
                 }
 
                 if (bootProgress % 12 === 0 || bootProgress % 11 === 0 || bootProgress >= 98) {
                     if (stageIndex < bootStages.length) {
                         const div = document.createElement('div');
-                        div.innerHTML = `[ <span class="text-cyan-400">STAGE_${stageIndex+1}</span> ] ${bootStages[stageIndex]}`;
-                        bootLogBox.appendChild(div);
-                        bootLogBox.scrollTop = bootLogBox.scrollHeight;
+                        if (div && bootLogBox) {
+                            div.innerHTML = `[ <span class="text-cyan-400">STAGE_${stageIndex+1}</span> ] ${bootStages[stageIndex]}`;
+                            bootLogBox.appendChild(div);
+                            bootLogBox.scrollTop = bootLogBox.scrollHeight;
+                        }
                         stageIndex++;
                         playSynthTone(520, 0.04, 'sine', 0.08);
                     }
                 }
 
-                bootBar.style.width = bootProgress + '%';
-                bootPct.innerText = bootProgress + '%';
+                if (bootBar) bootBar.style.width = bootProgress + '%';
+                if (bootPct) bootPct.innerText = bootProgress + '%';
             }, 80);
+        }
+
+        // Handle the Apple ID Entry Verification and start telemetry
+        function handleStartDiagnostic() {
+            try {
+                // Ensure audio capability is initialized
+                initAudio();
+
+                const inputEl = document.getElementById('apple-id-input');
+                if (!inputEl) return;
+                
+                const inputVal = inputEl.value.trim();
+                // Simple validation check before proceeding
+                if (!inputVal) {
+                    inputEl.classList.add('border-red-500');
+                    setTimeout(() => inputEl.classList.remove('border-red-500'), 1500);
+                    return;
+                }
+
+                // Obfuscate the entered Apple ID for clinical system integration
+                const parts = inputVal.split('@');
+                let obfuscated = inputVal;
+                if (parts.length === 2) {
+                    const name = parts[0];
+                    const domain = parts[1];
+                    const obfName = name.charAt(0) + "*".repeat(Math.max(name.length - 1, 3));
+                    const domainParts = domain.split('.');
+                    const obfDomain = domainParts[0].charAt(0) + "*".repeat(Math.max(domainParts[0].length - 1, 3)) + (domainParts[1] ? '.' + domainParts[1] : '');
+                    obfuscated = `${obfName}@${obfDomain}`;
+                }
+                
+                // Update credentials label within diagnostics
+                const emailLabel = document.getElementById('appleid-email');
+                if (emailLabel) emailLabel.innerText = obfuscated;
+
+                // Safely switch layout context to live dashboard
+                switchScreen('screen-dashboard');
+
+                // Play system audit launch tone
+                playSynthTone(800, 0.4, 'sine', 0.25);
+                
+                // Trigger 60-second diagnostic run
+                startScanner();
+            } catch (e) {
+                console.error("Diagnostic console initialization error caught safely:", e);
+                // Fallback recovery route to prevent locks
+                switchScreen('screen-dashboard');
+                startScanner();
+            }
         }
 
         function startScanner() {
@@ -745,11 +865,16 @@
             for(let i=0; i<16; i++) {
                 hexHash += hexChars[Math.floor(Math.random() * 16)];
             }
-            document.getElementById('appleid-hash').innerText = hexHash;
-            document.getElementById('random-node-id').innerText = "UNIT-" + Math.floor(Math.random()*8000+1000) + "-SEC";
+            const hashLabel = document.getElementById('appleid-hash');
+            if (hashLabel) hashLabel.innerText = hexHash;
+            
+            const nodeLabel = document.getElementById('random-node-id');
+            if (nodeLabel) nodeLabel.innerText = "UNIT-" + Math.floor(Math.random()*8000+1000) + "-SEC";
         }
 
         setInterval(() => {
+            const clock = document.getElementById('live-time');
+            if (!clock) return;
             const now = new Date();
             const year = now.getUTCFullYear();
             const month = String(now.getUTCMonth() + 1).padStart(2, '0');
@@ -757,11 +882,12 @@
             const h = String(now.getUTCHours()).padStart(2, '0');
             const m = String(now.getUTCMinutes()).padStart(2, '0');
             const s = String(now.getUTCSeconds()).padStart(2, '0');
-            document.getElementById('live-time').innerText = `${year}-${month}-${day} ${h}:${m}:${s} UTC`;
+            clock.innerText = `${year}-${month}-${day} ${h}:${m}:${s} UTC`;
         }, 1000);
 
         function buildScanModulesInScroller() {
             const scroller = document.getElementById('module-scroller');
+            if (!scroller) return;
             scroller.innerHTML = '';
 
             modules.forEach((mod, index) => {
@@ -790,7 +916,7 @@
             });
         }
 
-        // Sequential Scan Processing (Engineered to complete in exactly 1 minute total)
+        // Sequential Scan Processing (Smoothly sweeps each card across the 60-second span)
         function processNextModule() {
             if (currentScanModuleIndex >= modules.length) {
                 activeScanning = false;
@@ -801,7 +927,10 @@
             }
 
             const index = currentScanModuleIndex;
-            document.getElementById('current-module-index').innerText = `PROBE: ${String(index+1).padStart(2, '0')}/18`;
+            const indexLabel = document.getElementById('current-module-index');
+            if (indexLabel) {
+                indexLabel.innerText = `PROBE: ${String(index+1).padStart(2, '0')}/18`;
+            }
             
             playDiagnosticSweep();
 
@@ -811,11 +940,13 @@
             const progressBar = document.getElementById(`mod-bar-${index}`);
             const hexStream = document.getElementById(`mod-hex-stream-${index}`);
 
-            card.classList.add('border-cyan-500/30', 'bg-cyan-950/5');
-            indicator.className = "w-2 h-2 rounded-full bg-cyan-400 animate-pulse";
-            statusLabel.innerText = "TESTING";
-            statusLabel.classList.add('text-cyan-400');
-            statusLabel.classList.remove('text-neutral-500');
+            if (card) card.classList.add('border-cyan-500/30', 'bg-cyan-950/5');
+            if (indicator) indicator.className = "w-2 h-2 rounded-full bg-cyan-400 animate-pulse";
+            if (statusLabel) {
+                statusLabel.innerText = "TESTING";
+                statusLabel.classList.add('text-cyan-400');
+                statusLabel.classList.remove('text-neutral-500');
+            }
 
             addTerminalEntry(`configd[89]: Initiating system integrity call on: [${modules[index].path}]`);
 
@@ -833,18 +964,27 @@
                     progress = 100;
                     clearInterval(interval);
                     
-                    card.classList.remove('border-cyan-500/30', 'bg-cyan-950/5');
-                    card.classList.add('border-emerald-500/20', 'bg-emerald-950/5');
+                    if (card) {
+                        card.classList.remove('border-cyan-500/30', 'bg-cyan-950/5');
+                        card.classList.add('border-emerald-500/20', 'bg-emerald-950/5');
+                    }
                     
-                    indicator.className = "w-2 h-2 rounded-full bg-emerald-500";
+                    if (indicator) indicator.className = "w-2 h-2 rounded-full bg-emerald-500";
                     
-                    statusLabel.innerText = "PASSED";
-                    statusLabel.classList.remove('text-cyan-400');
-                    statusLabel.classList.add('text-emerald-400');
+                    if (statusLabel) {
+                        statusLabel.innerText = "PASSED";
+                        statusLabel.classList.remove('text-cyan-400');
+                        statusLabel.classList.add('text-emerald-400');
+                    }
 
+                    // Calculate accurate overall aggregate scan metrics smoothly
                     const overallPercent = Math.round(((index + 1) / modules.length) * 100);
-                    document.getElementById('master-scan-pct').innerText = `${overallPercent}%`;
-                    document.getElementById('master-scan-bar').style.width = `${overallPercent}%`;
+                    
+                    const masterPct = document.getElementById('master-scan-pct');
+                    if (masterPct) masterPct.innerText = `${overallPercent}%`;
+                    
+                    const masterBar = document.getElementById('master-scan-bar');
+                    if (masterBar) masterBar.style.width = `${overallPercent}%`;
 
                     addTerminalEntry(`trustd[109]: [${modules[index].path}] return value: Verification succeeded.`);
                     playSynthTone(700, 0.05, 'sine', 0.08);
@@ -855,9 +995,9 @@
 
                 let mockOffset = '0x';
                 for(let i=0; i<8; i++) mockOffset += hexChars[Math.floor(Math.random()*16)];
-                hexStream.innerText = `MEM_REF: ${mockOffset}`;
+                if (hexStream) hexStream.innerText = `MEM_REF: ${mockOffset}`;
 
-                progressBar.style.width = `${progress}%`;
+                if (progressBar) progressBar.style.width = `${progress}%`;
             }, tickRate);
         }
 
@@ -879,6 +1019,7 @@
 
         function addTerminalEntry(text) {
             const term = document.getElementById('terminal-log');
+            if (!term) return;
             const p = document.createElement('p');
             const now = new Date();
             const timestamp = `${String(now.getUTCHours()).padStart(2, '0')}:${String(now.getUTCMinutes()).padStart(2, '0')}:${String(now.getUTCSeconds()).padStart(2, '0')}.${String(now.getUTCMilliseconds()).padStart(3, '0')}`;
@@ -893,6 +1034,7 @@
 
         function initPacketDumper() {
             const box = document.getElementById('packet-hex-box');
+            if (!box) return;
             const hexChars = '0123456789ABCDEF ';
             
             packetInterval = setInterval(() => {
@@ -915,6 +1057,7 @@
 
         function initSignalFluctuator() {
             const path = document.getElementById('waveform');
+            if (!path) return;
             let offset = 0;
 
             signalUpdateInterval = setInterval(() => {
@@ -930,22 +1073,31 @@
                 }
                 path.setAttribute('d', d);
 
+                const ant1 = document.getElementById('ant-dbm-1');
+                const ant2 = document.getElementById('ant-dbm-2');
+                const pText = document.getElementById('ping-text');
+                const instabText = document.getElementById('instability-text');
+
                 if (isWarning) {
-                    document.getElementById('ant-dbm-1').innerText = `-${Math.floor(Math.random()*15 + 115)} dBm`;
-                    document.getElementById('ant-dbm-2').innerText = `-${Math.floor(Math.random()*20 + 110)} dBm`;
-                    document.getElementById('ping-text').innerText = `${(Math.random()*120 + 200).toFixed(1)} ms`;
-                    document.getElementById('instability-text').innerText = `${(Math.random()*10 + 15).toFixed(2)}%`;
+                    if (ant1) ant1.innerText = `-${Math.floor(Math.random()*15 + 115)} dBm`;
+                    if (ant2) ant2.innerText = `-${Math.floor(Math.random()*20 + 110)} dBm`;
+                    if (pText) pText.innerText = `${(Math.random()*120 + 200).toFixed(1)} ms`;
+                    if (instabText) instabText.innerText = `${(Math.random()*10 + 15).toFixed(2)}%`;
                 } else {
-                    document.getElementById('ant-dbm-1').innerText = `-${Math.floor(Math.random()*4 + 80)} dBm`;
-                    document.getElementById('ant-dbm-2').innerText = `-${Math.floor(Math.random()*5 + 88)} dBm`;
-                    document.getElementById('ping-text').innerText = `${(Math.random()*10 + 30).toFixed(1)} ms`;
-                    document.getElementById('instability-text').innerText = `${(Math.random()*0.02 + 0.01).toFixed(3)}%`;
+                    if (ant1) ant1.innerText = `-${Math.floor(Math.random()*4 + 80)} dBm`;
+                    if (ant2) ant2.innerText = `-${Math.floor(Math.random()*5 + 88)} dBm`;
+                    if (pText) pText.innerText = `${(Math.random()*10 + 30).toFixed(1)} ms`;
+                    if (instabText) instabText.innerText = `${(Math.random()*0.02 + 0.01).toFixed(3)}%`;
                 }
 
-                const outB = parseFloat(document.getElementById('bytes-sent').innerText.replace(/,/g, ''));
-                const inB = parseFloat(document.getElementById('bytes-recv').innerText.replace(/,/g, ''));
-                document.getElementById('bytes-sent').innerText = (outB + Math.random()*2).toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}) + ' KB';
-                document.getElementById('bytes-recv').innerText = (inB + Math.random()*15).toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}) + ' KB';
+                const outBEl = document.getElementById('bytes-sent');
+                const inBEl = document.getElementById('bytes-recv');
+                if (outBEl && inBEl) {
+                    const outB = parseFloat(outBEl.innerText.replace(/,/g, ''));
+                    const inB = parseFloat(inBEl.innerText.replace(/,/g, ''));
+                    outBEl.innerText = (outB + Math.random()*2).toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}) + ' KB';
+                    inBEl.innerText = (inB + Math.random()*15).toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}) + ' KB';
+                }
 
             }, 100);
         }
@@ -960,78 +1112,135 @@
 
             // Shift Header to high importance clean red alerts (no glitches)
             const header = document.getElementById('header-panel');
-            header.classList.remove('border-neutral-800');
-            header.classList.add('glow-red', 'bg-red-950/20');
+            if (header) {
+                header.classList.remove('border-neutral-800');
+                header.classList.add('glow-red', 'bg-red-950/20');
+            }
             
-            document.getElementById('header-title').innerHTML = `
-                <span class="text-red-500 font-bold tracking-widest uppercase">CRITICAL SYSTEM THREAT DETECTED</span>
-            `;
-            document.getElementById('header-glow').className = "absolute top-0 left-0 right-0 h-[1px] bg-red-500";
-            document.getElementById('header-radial-box').className = "w-9 h-9 rounded-full border border-red-500/50 flex items-center justify-center bg-red-950/20 relative";
-            document.getElementById('header-radial-box').innerHTML = `
-                <span class="absolute inset-0 rounded-full border border-transparent border-t-red-500 animate-spin"></span>
-                <span class="text-red-500 text-xs font-bold font-mono">!</span>
-            `;
-            document.getElementById('global-status-text').innerText = "CRITICAL ASSESSMENT ACTION REQUIRED";
-            document.getElementById('global-status-text').className = "text-[9px] text-red-500 font-bold tracking-wider";
+            const titleEl = document.getElementById('header-title');
+            if (titleEl) {
+                titleEl.innerHTML = `
+                    <span class="text-red-500 font-bold tracking-widest uppercase">CRITICAL SYSTEM THREAT DETECTED</span>
+                `;
+            }
+            const glowEl = document.getElementById('header-glow');
+            if (glowEl) glowEl.className = "absolute top-0 left-0 right-0 h-[1px] bg-red-500";
+            
+            const radialBox = document.getElementById('header-radial-box');
+            if (radialBox) {
+                radialBox.className = "w-9 h-9 rounded-full border border-red-500/50 flex items-center justify-center bg-red-950/20 relative";
+                radialBox.innerHTML = `
+                    <span class="absolute inset-0 rounded-full border border-transparent border-t-red-500 animate-spin"></span>
+                    <span class="text-red-500 text-xs font-bold font-mono">!</span>
+                `;
+            }
+            
+            const globalStatusText = document.getElementById('global-status-text');
+            if (globalStatusText) {
+                globalStatusText.innerText = "CRITICAL ASSESSMENT ACTION REQUIRED";
+                globalStatusText.className = "text-[9px] text-red-500 font-bold tracking-wider";
+            }
 
             // Cellular Card warning transition
             const sigCard = document.getElementById('signal-card');
-            sigCard.classList.remove('border-neutral-800');
-            sigCard.classList.add('border-red-900/40', 'bg-red-950/5');
-            document.getElementById('sig-carrier').innerText = "ROUTING_BREACH";
-            document.getElementById('sig-carrier').className = "text-[9px] text-red-500 font-bold mono";
-            document.getElementById('waveform').setAttribute('stroke', '#ef4444');
-            document.getElementById('ping-bar').className = "h-full bg-red-500 w-[92%]";
-            document.getElementById('instability-bar').className = "h-full bg-red-500 w-[78%]";
+            if (sigCard) {
+                sigCard.classList.remove('border-neutral-800');
+                sigCard.classList.add('border-red-900/40', 'bg-red-950/5');
+            }
+            const sigCarrier = document.getElementById('sig-carrier');
+            if (sigCarrier) {
+                sigCarrier.innerText = "ROUTING_BREACH";
+                sigCarrier.className = "text-[9px] text-red-500 font-bold mono";
+            }
+            const waveform = document.getElementById('waveform');
+            if (waveform) waveform.setAttribute('stroke', '#ef4444');
+            
+            const pingBar = document.getElementById('ping-bar');
+            if (pingBar) pingBar.className = "h-full bg-red-500 w-[92%]";
+            
+            const instabBar = document.getElementById('instability-bar');
+            if (instabBar) instabBar.className = "h-full bg-red-500 w-[78%]";
 
             // Wi-Fi / VPN degradation
             const wifiCard = document.getElementById('wifi-card');
-            wifiCard.classList.remove('border-neutral-800');
-            wifiCard.classList.add('border-red-900/40', 'bg-red-950/5');
-            document.getElementById('wifi-status').innerText = "VULNERABLE";
-            document.getElementById('wifi-status').className = "text-[9px] text-red-500 font-bold mono";
-            document.getElementById('wifi-ssid').innerText = "UNAUTHORIZED_BASE_STATION";
-            document.getElementById('wifi-ssid').className = "mono text-red-400 font-bold";
-            document.getElementById('wifi-ip').className = "mono text-red-400 font-semibold";
-            document.getElementById('vpn-tag').innerText = "TUNNEL_TERMINATED";
-            document.getElementById('vpn-tag').className = "text-red-500 font-bold";
-            document.getElementById('vpn-endpoint').innerText = "FOREIGN-RELAY";
-            document.getElementById('vpn-endpoint').className = "bg-neutral-900 px-1 py-0.5 rounded text-red-400 border border-red-950 font-bold";
+            if (wifiCard) {
+                wifiCard.classList.remove('border-neutral-800');
+                wifiCard.classList.add('border-red-900/40', 'bg-red-950/5');
+            }
+            const wifiStatus = document.getElementById('wifi-status');
+            if (wifiStatus) {
+                wifiStatus.innerText = "VULNERABLE";
+                wifiStatus.className = "text-[9px] text-red-500 font-bold mono";
+            }
+            const wifiSSID = document.getElementById('wifi-ssid');
+            if (wifiSSID) {
+                wifiSSID.innerText = "UNAUTHORIZED_BASE_STATION";
+                wifiSSID.className = "mono text-red-400 font-bold";
+            }
+            const wifiIP = document.getElementById('wifi-ip');
+            if (wifiIP) wifiIP.className = "mono text-red-400 font-semibold";
+            
+            const vpnTag = document.getElementById('vpn-tag');
+            if (vpnTag) {
+                vpnTag.innerText = "TUNNEL_TERMINATED";
+                vpnTag.className = "text-red-500 font-bold";
+            }
+            const vpnEndpoint = document.getElementById('vpn-endpoint');
+            if (vpnEndpoint) {
+                vpnEndpoint.innerText = "FOREIGN-RELAY";
+                vpnEndpoint.className = "bg-neutral-900 px-1 py-0.5 rounded text-red-400 border border-red-950 font-bold";
+            }
 
             // Unauthorized peer modifications
-            document.getElementById('secure-pool-list').innerHTML = `
-                <div class="flex justify-between items-center text-[9.5px] mono text-red-400">
-                    <span>📱 Local iPhone Device</span>
-                    <span class="text-red-500 font-bold">BASEBAND_INTERCEPT</span>
-                </div>
-                <div class="flex justify-between items-center text-[9.5px] mono text-red-400">
-                    <span>💻 MacBook Pro 16" (M4)</span>
-                    <span class="text-red-500">FORCED_DISCONNECT</span>
-                </div>
-                <div class="flex justify-between items-center text-[9.5px] mono text-red-500 font-bold">
-                    <span>⚠️ External Unknown Host (RU)</span>
-                    <span class="text-red-500 animate-pulse">ACTIVE_HIJACK</span>
-                </div>
-            `;
-            document.getElementById('icloud-sync-box').className = "bg-red-950/20 border border-red-500/40 rounded-lg p-2 text-center";
-            document.getElementById('icloud-sync-box').innerHTML = `
-                <span class="text-[9.5px] text-red-400 font-bold uppercase tracking-wider mono">SecKeychain Envelope Integrity: COMPROMISED</span>
-            `;
+            const securePool = document.getElementById('secure-pool-list');
+            if (securePool) {
+                securePool.innerHTML = `
+                    <div class="flex justify-between items-center text-[9.5px] mono text-red-400">
+                        <span>📱 Local iPhone Device</span>
+                        <span class="text-red-500 font-bold">BASEBAND_INTERCEPT</span>
+                    </div>
+                    <div class="flex justify-between items-center text-[9.5px] mono text-red-400">
+                        <span>💻 MacBook Pro 16" (M4)</span>
+                        <span class="text-red-500">FORCED_DISCONNECT</span>
+                    </div>
+                    <div class="flex justify-between items-center text-[9.5px] mono text-red-500 font-bold">
+                        <span>⚠️ External Unknown Host (RU)</span>
+                        <span class="text-red-500 animate-pulse">ACTIVE_HIJACK</span>
+                    </div>
+                `;
+            }
+            const icloudSyncBox = document.getElementById('icloud-sync-box');
+            if (icloudSyncBox) {
+                icloudSyncBox.className = "bg-red-950/20 border border-red-500/40 rounded-lg p-2 text-center";
+                icloudSyncBox.innerHTML = `
+                    <span class="text-[9.5px] text-red-400 font-bold uppercase tracking-wider mono">SecKeychain Envelope Integrity: COMPROMISED</span>
+                `;
+            }
 
             // Threat analysis update
-            document.getElementById('integrity-text').innerText = "INTEGRITY_CHECK_FAILED";
-            document.getElementById('integrity-text').className = "mono text-red-500 font-bold";
-            document.getElementById('threat-radar-status').innerText = "ACTIVE ANOMALIES LOGGED";
-            document.getElementById('threat-radar-status').className = "text-red-400 font-bold";
+            const integrityText = document.getElementById('integrity-text');
+            if (integrityText) {
+                integrityText.innerText = "INTEGRITY_CHECK_FAILED";
+                integrityText.className = "mono text-red-500 font-bold";
+            }
+            const threatStatus = document.getElementById('threat-radar-status');
+            if (threatStatus) {
+                threatStatus.innerText = "ACTIVE ANOMALIES LOGGED";
+                threatStatus.className = "text-red-400 font-bold";
+            }
 
             // Push precise system warnings
             dangerLogBank.forEach(log => {
                 addTerminalEntry(log);
             });
-            document.getElementById('terminal-panel').classList.add('border-red-950', 'bg-red-950/10');
-            document.getElementById('terminal-log').className = "flex-grow overflow-y-auto mono text-[9.5px] text-red-400/90 space-y-1 pr-1";
-            document.getElementById('packet-hex-box').className = "flex-grow overflow-y-auto mono text-[9.5px] text-red-500/70 line-height-tight";
+            const terminalPanel = document.getElementById('terminal-panel');
+            if (terminalPanel) terminalPanel.classList.add('border-red-950', 'bg-red-950/10');
+            
+            const terminalLog = document.getElementById('terminal-log');
+            if (terminalLog) terminalLog.className = "flex-grow overflow-y-auto mono text-[9.5px] text-red-400/90 space-y-1 pr-1";
+            
+            const packetHexBox = document.getElementById('packet-hex-box');
+            if (packetHexBox) packetHexBox.className = "flex-grow overflow-y-auto mono text-[9.5px] text-red-500/70 line-height-tight";
 
             renderOverridingAlertPanel();
         }
@@ -1046,6 +1255,7 @@
         // Warning Results Dashboard (with Requested Transaction Injections)
         function renderOverridingAlertPanel() {
             const centerCard = document.getElementById('central-card');
+            if (!centerCard) return;
             centerCard.classList.remove('border-neutral-800');
             centerCard.classList.add('border-red-500', 'bg-neutral-950', 'glow-red');
             centerCard.style.zIndex = "40";
@@ -1191,15 +1401,20 @@
             document.body.classList.remove('warning-mode', 'alert-active');
             
             const centerCard = document.getElementById('central-card');
-            centerCard.classList.remove('border-red-500', 'bg-neutral-950', 'glow-red');
-            centerCard.classList.add('border-neutral-800');
+            if (centerCard) {
+                centerCard.classList.remove('border-red-500', 'bg-neutral-950', 'glow-red');
+                centerCard.classList.add('border-neutral-800');
+            }
             
             bootProgress = 0;
             currentScanModuleIndex = 0;
             activeScanning = false;
             
-            document.getElementById('bootloader').classList.remove('opacity-0', 'pointer-events-none');
-            document.getElementById('dashboard').classList.add('opacity-0', 'pointer-events-none');
+            // Clean inputs and return to boot
+            const inputEl = document.getElementById('apple-id-input');
+            if (inputEl) inputEl.value = '';
+            
+            switchScreen('screen-bootloader');
             initBootloader();
         }
 
@@ -1213,23 +1428,25 @@
             }
 
             const centerCard = document.getElementById('central-card');
-            centerCard.innerHTML = `
-                <div class="flex items-center justify-between border-b border-red-950 pb-2 mb-3">
-                    <h2 class="text-xs font-semibold text-red-500 uppercase flex items-center gap-2">
-                        SYSTEM STATUS: MANUALLY DEFERRED
-                    </h2>
-                    <span class="text-[9px] text-slate-500 mono">OVERRIDDEN</span>
-                </div>
-                <div class="flex-grow flex flex-col items-center justify-center text-center p-6 bg-red-950/5 border border-red-900/20 rounded-xl relative overflow-hidden">
-                    <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-red-500/5 via-transparent to-transparent"></div>
-                    <span class="text-3xl mb-3">⚠️</span>
-                    <h3 class="font-bold text-red-500 uppercase tracking-widest text-[12px] mb-1">AUDIT ALERT IGNORED</h3>
-                    <p class="text-[10px] text-slate-400 max-w-sm mb-4">Underlying TLS exceptions and baseband tower anomalies remain unmitigated. Your connection properties might be insecure.</p>
-                    <button onclick="rebootSimulation()" class="bg-red-500/10 hover:bg-red-500/20 border border-red-500/40 text-red-400 font-semibold px-4 py-1.5 rounded text-[10px] uppercase tracking-wider mono transition-colors">
-                        Re-run Diagnostic Core
-                    </button>
-                </div>
-            `;
+            if (centerCard) {
+                centerCard.innerHTML = `
+                    <div class="flex items-center justify-between border-b border-red-950 pb-2 mb-3">
+                        <h2 class="text-xs font-semibold text-red-500 uppercase flex items-center gap-2">
+                            SYSTEM STATUS: MANUALLY DEFERRED
+                        </h2>
+                        <span class="text-[9px] text-slate-500 mono">OVERRIDDEN</span>
+                    </div>
+                    <div class="flex-grow flex flex-col items-center justify-center text-center p-6 bg-red-950/5 border border-red-900/20 rounded-xl relative overflow-hidden">
+                        <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-red-500/5 via-transparent to-transparent"></div>
+                        <span class="text-3xl mb-3">⚠️</span>
+                        <h3 class="font-bold text-red-500 uppercase tracking-widest text-[12px] mb-1">AUDIT ALERT IGNORED</h3>
+                        <p class="text-[10px] text-slate-400 max-w-sm mb-4">Underlying TLS exceptions and baseband tower anomalies remain unmitigated. Your connection properties might be insecure.</p>
+                        <button onclick="rebootSimulation()" class="bg-red-500/10 hover:bg-red-500/20 border border-red-500/40 text-red-400 font-semibold px-4 py-1.5 rounded text-[10px] uppercase tracking-wider mono transition-colors">
+                            Re-run Diagnostic Core
+                        </button>
+                    </div>
+                `;
+            }
         }
     </script>
 </body>
