@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apple CoreNetwork Diagnostics & Security Audit Utility</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=SF+Pro+Display:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #000000;
+            overflow-x: hidden;
+            color: #f5f5f7;
+        }
+
+        .mono {
+            font-family: 'Fira Code', monospace;
+        }
+
+        /* Diagnostic Glow Settings */
+        .glow-cyan {
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.25);
+            border-color: rgba(6, 182, 212, 0.5);
+        }
+        .glow-red {
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.35);
+            border-color: rgba(239, 68, 68, 0.7);
+        }
+        .glow-green {
+            box-shadow: 0 0 15px rgba(34, 197, 94, 0.25);
+            border-color: rgba(34, 197, 94, 0.5);
+        }
+
+        /* Custom thin scrollbar */
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.4);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(6, 182, 212, 0.4);
+            border-radius: 2px;
+        }
+        .warning-mode ::-webkit-scrollbar-thumb {
+            background: rgba(239, 68, 68, 0.4);
+        }
+
+        /* Stable alert pulsing without shaking/jittering */
+        @keyframes alert-pulse {
+            0%, 100% { background-color: rgba(239, 68, 68, 0.0); }
+            50% { background-color: rgba(239, 68, 68, 0.06); }
+        }
+        .alert-active {
+            animation: alert-pulse 2s infinite ease-in-out;
+        }
+
+        /* Sweep animation for radar component */
+        @keyframes radar-sweep {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .radar-line {
+            transform-origin: 50% 50%;
+            animation: radar-sweep 5s linear infinite;
+        }
+
+        @keyframes cursor-blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        .terminal-cursor {
+            animation: cursor-blink 1s infinite;
+        }
+    </style>
+</head>
+<body class="text-slate-200 min-h-screen flex flex-col relative select-none">
+
+    <!-- Audio Control Console -->
+    <div id="audio-opt-in" class="fixed top-3 right-3 z-50 bg-neutral-900/90 border border-neutral-800 rounded-lg px-4 py-2 text-xs flex items-center gap-3 shadow-lg backdrop-blur-md">
+        <span class="inline-block w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+        <span class="mono text-cyan-400 text-[10px] font-medium tracking-wide">SYSTEM AUDIO MODULE</span>
+        <button onclick="toggleAudio()" id="audio-toggle-btn" class="bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/40 rounded px-2.5 py-0.5 text-[9px] text-cyan-300 font-semibold transition-colors uppercase">
+            Enable Audio
+        </button>
+    </div>
+
+    <!-- Active Grid Particle Canvas -->
+    <canvas id="gridCanvas" class="absolute inset-0 pointer-events-none opacity-30 z-0"></canvas>
+
+    <!-- INITIAL DIAGNOSTIC ENGINE BOOTLOADER -->
+    <div id="bootloader" class="fixed inset-0 bg-black z-50 flex flex-col items-center justify-center p-6 transition-all duration-700">
+        <div class="max-w-md w-full flex flex-col items-center">
+            
+            <!-- Highly Accurate Apple Logo Silhouette Vector with High Precision Pathing -->
+            <div class="w-16 h-16 mb-8 relative">
+                <svg class="w-full h-full text-slate-100 fill-current drop-shadow-[0_0_12px_rgba(255,255,255,0.4)] animate-pulse" viewBox="0 0 170 170">
+                    <path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.34.13-9.13-1.92-14.34-6.15-3.02-2.5-6.87-7.07-11.55-13.69-4.73-6.69-8.49-14.15-11.27-22.4C10.74 107.5 7.6 92.17 7.6 77.42c0-15.01 3.42-27.17 10.26-36.47 6.83-9.3 15.17-14.01 25.01-14.14 5.37 0 10.88 1.48 16.54 4.45 5.66 2.97 9.4 4.45 11.22 4.45 1.48 0 5.41-1.57 11.78-4.73 6.37-3.16 11.88-4.63 16.54-4.41 12.35.67 22.3 5.16 29.83 13.47-11.56 6.95-17.21 16.49-16.94 28.61.27 9.68 3.86 17.6 10.77 23.77 6.91 6.17 14.88 9.53 23.91 10.08-2.61 7.68-6.11 15.42-10.5 23.21zM119.22 16.03c0-6.19 2.19-12.01 6.57-17.48 1.34-1.61 2.85-3.17 4.52-4.67C135.53-8.8 141.4-10.42 147.9-10c.13 1.21.2 2.3.2 3.27 0 6.14-2.31 11.96-6.93 17.48-4.63 5.51-10.49 9.11-17.58 8.8-.23-1.07-.37-2.22-.37-3.58z" />
+                </svg>
+            </div>
+
+            <!-- Boot Status Panel -->
+            <div class="w-full bg-neutral-900/60 border border-neutral-800 rounded-lg p-5 mb-4 backdrop-blur-md">
+                <div class="flex items-center justify-between text-[11px] text-cyan-400 font-bold mb-3 mono tracking-wider">
+                    <span>APPLE DIAGNOSTIC DEPLOYMENT (KERNEL_v20.4)</span>
+                    <span id="boot-status-pct">0%</span>
+                </div>
+                
+                <div class="w-full h-1 bg-neutral-950 rounded-full overflow-hidden mb-4">
+                    <div id="boot-progress-bar" class="h-full bg-cyan-500 w-0 transition-all duration-100 ease-out"></div>
+                </div>
+
+                <div id="boot-log-box" class="h-32 overflow-y-auto text-[10px] mono text-slate-400 space-y-1.5 pr-1">
+                    <div>[ <span class="text-cyan-400">STAGE_1</span> ] Loading security certificates from Secure Enclave Processor...</div>
+                </div>
+            </div>
+            
+            <p class="text-[10px] text-neutral-500 font-medium mono tracking-[0.2em] text-center uppercase animate-pulse">
+                Establishing Secured Interface Bridge
+            </p>
+        </div>
+    </div>
+
+    <!-- MAIN DIAGNOSTIC DASHBOARD -->
+    <div id="dashboard" class="flex-grow flex flex-col z-10 opacity-0 transition-opacity duration-1000 pointer-events-none p-4 max-w-7xl mx-auto w-full gap-4">
+        
+        <!-- HEADER ELEMENT -->
+        <header class="bg-neutral-950/80 border border-neutral-800 rounded-xl p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 backdrop-blur-lg shadow-2xl relative overflow-hidden transition-all duration-500" id="header-panel">
+            <div class="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-80" id="header-glow"></div>
+            
+            <div class="flex items-center gap-3.5">
+                <div class="p-2.5 bg-neutral-900 border border-neutral-800 rounded-lg relative" id="header-icon-box">
+                    <svg class="w-5 h-5 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 009 11.5c0-2.433-.61-4.73-1.693-6.732m7.845 2.196a11.953 11.953 0 011.693 6.732c0 1.882-.435 3.664-1.214 5.25m-3.993-11.238a11.963 11.963 0 00-3.07 0c-1.524.232-2.71 1.419-2.943 2.943-.217 1.418-.113 2.87.294 4.22M12.018 5.97a12.016 12.016 0 00-3.07 0c-1.524.232-2.71 1.419-2.943 2.943-.22 1.433-.12 2.902.302 4.265m9.186-9.186a11.94 11.94 0 013.07 0c1.524.232 2.71 1.419 2.943 2.943.22 1.433.12 2.902-.302 4.265M12 9v2m0 4h.01" />
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="font-bold text-sm tracking-wider flex items-center gap-2" id="header-title">
+                        <span>IPHONE NETWORK SECURITY UTILITY</span> 
+                        <span class="text-[9px] bg-cyan-950 text-cyan-400 px-2 py-0.5 rounded border border-cyan-800/60 font-semibold mono" id="header-tag">DIAG_v20.4</span>
+                    </h1>
+                    <div class="text-[10px] text-slate-400 mono mt-0.5 flex flex-wrap gap-x-4 gap-y-1">
+                        <span>Device: <strong class="text-slate-200">Local iPhone Device</strong></span>
+                        <span>Arch: <strong class="text-slate-200">Apple Silicon (A21S)</strong></span>
+                        <span>Unit-ID: <strong class="text-slate-200" id="random-node-id">DA-0091-SEC</strong></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4 text-xs mono border-l border-neutral-800 pl-0 md:pl-6">
+                <div class="text-right">
+                    <div class="text-slate-500 text-[8px] uppercase tracking-wider">CHRONOMETER INTEGRATION</div>
+                    <div class="text-slate-200 font-semibold text-xs tracking-wider" id="live-time">13:42:09 UTC</div>
+                    <div class="text-[9px] text-cyan-400 font-bold tracking-wider" id="global-status-text">SYSTEM ASSESSMENT STATUS: GREEN</div>
+                </div>
+                <div class="w-9 h-9 rounded-full border border-neutral-800 flex items-center justify-center bg-neutral-900 relative" id="header-radial-box">
+                    <span class="absolute inset-0 rounded-full border border-transparent border-t-cyan-500 animate-spin"></span>
+                    <svg class="w-4 h-4 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                </div>
+            </div>
+        </header>
+
+        <!-- DASHBOARD GRID -->
+        <main class="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-grow">
+            
+            <!-- LEFT SECTION: NETWORK TELEMETRY LAYERS (Col: 4) -->
+            <section class="lg:col-span-4 flex flex-col gap-4">
+                
+                <!-- CARRIER & ANTENNA -->
+                <div class="bg-neutral-950/85 border border-neutral-800 rounded-xl p-4 flex flex-col gap-3 relative overflow-hidden backdrop-blur-md flex-1 min-h-[220px]" id="signal-card">
+                    <div class="flex items-center justify-between border-b border-neutral-900 pb-2">
+                        <h2 class="text-xs font-semibold tracking-wider text-slate-300 uppercase flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse"></span>
+                            LTE / 5G RF Baseband Telemetry
+                        </h2>
+                        <span class="text-[9px] text-slate-500 mono" id="sig-carrier">CORE_CARRIER_LINK</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 my-1">
+                        <div class="bg-black/50 border border-neutral-900 rounded-lg p-2 text-center">
+                            <span class="text-[9px] text-slate-500 block uppercase mono">Avg Latency</span>
+                            <span class="text-xs font-semibold text-cyan-400 mono mt-0.5 block" id="ping-text">38.4 ms</span>
+                            <div class="w-full bg-neutral-900 h-1 rounded-full overflow-hidden mt-1">
+                                <div id="ping-bar" class="bg-cyan-500 h-full w-[35%] transition-all duration-500"></div>
+                            </div>
+                        </div>
+                        <div class="bg-black/50 border border-neutral-900 rounded-lg p-2 text-center">
+                            <span class="text-[9px] text-slate-500 block uppercase mono">Packet Instability</span>
+                            <span class="text-xs font-semibold text-emerald-400 mono mt-0.5 block" id="instability-text">0.01%</span>
+                            <div class="w-full bg-neutral-900 h-1 rounded-full overflow-hidden mt-1">
+                                <div id="instability-bar" class="bg-emerald-500 h-full w-[3%] transition-all duration-500"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Antenna Power Levels -->
+                    <div class="space-y-2 mt-1">
+                        <div>
+                            <div class="flex justify-between text-[9px] mono text-slate-400 mb-0.5">
+                                <span>ANTENNA TRANSCEIVER MAIN [S1]</span>
+                                <span class="text-cyan-400 font-bold" id="ant-dbm-1">-82 dBm</span>
+                            </div>
+                            <div class="w-full h-1 bg-neutral-900 rounded-full overflow-hidden">
+                                <div id="ant-bar-1" class="h-full bg-cyan-500 w-[81%] transition-all duration-300"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-[9px] mono text-slate-400 mb-0.5">
+                                <span>ANTENNA TRANSCEIVER DIVERSITY [S2]</span>
+                                <span class="text-cyan-400 font-bold" id="ant-dbm-2">-91 dBm</span>
+                            </div>
+                            <div class="w-full h-1 bg-neutral-900 rounded-full overflow-hidden">
+                                <div id="ant-bar-2" class="h-full bg-cyan-500 w-[68%] transition-all duration-300"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Live Signal Waveform SVG Canvas -->
+                    <div class="flex-grow mt-1.5 flex items-center justify-center border border-neutral-900 rounded-lg bg-black/50 overflow-hidden h-24 relative">
+                        <div class="absolute inset-x-2 top-2 text-[8px] mono text-slate-500 flex justify-between z-10 pointer-events-none">
+                            <span>BASEBAND RF SPECTRUM OSCILLOSCOPE</span>
+                            <span id="spectrum-freq" class="text-cyan-500">5.825 GHz</span>
+                        </div>
+                        <svg class="w-full h-full" viewBox="0 0 300 80" preserveAspectRatio="none">
+                            <path id="waveform" d="M 0 40 Q 30 20 60 40 T 120 40 T 180 40 T 240 40 T 300 40" fill="none" stroke="#06b6d4" stroke-width="1.5" class="transition-all duration-200"></path>
+                            <line x1="0" y1="40" x2="300" y2="40" stroke="rgba(255,255,255,0.05)" stroke-dasharray="3"></line>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- CO-2: GATEWAY & IP SECURITY -->
+                <div class="bg-neutral-950/85 border border-neutral-800 rounded-xl p-4 flex flex-col gap-3 relative overflow-hidden backdrop-blur-md flex-1 min-h-[220px]" id="wifi-card">
+                    <div class="flex items-center justify-between border-b border-neutral-900 pb-2">
+                        <h2 class="text-xs font-semibold tracking-wider text-slate-300 uppercase flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                            Wi-Fi & VPN Encryption Status
+                        </h2>
+                        <span class="text-[9px] text-emerald-400 font-bold mono" id="wifi-status">SECURED</span>
+                    </div>
+
+                    <div class="space-y-2.5 my-1">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-slate-400 mono">Active Interface IP:</span>
+                            <span class="mono text-cyan-400 font-semibold" id="wifi-ip">10.147.22.189</span>
+                        </div>
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-slate-400 mono">BSSID Gateway Address:</span>
+                            <span class="mono text-slate-300" id="wifi-ssid">Apple_Global_Secure_Node</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-black/80 rounded-lg p-2 border border-neutral-900">
+                        <div class="flex items-center justify-between text-[9px] mono text-slate-500 mb-1">
+                            <span>CoreTLS VPN Endpoint Interface</span>
+                            <span id="vpn-tag" class="text-emerald-400 font-bold">VERIFIED</span>
+                        </div>
+                        <div class="flex items-center justify-between gap-1 text-[9px] mono">
+                            <span class="bg-neutral-900 px-1 py-0.5 rounded text-slate-400 border border-neutral-800">Local Enclave</span>
+                            <span class="text-slate-500 flex-grow border-b border-dashed border-emerald-500/50 h-2"></span>
+                            <span class="text-emerald-400 text-[8px] font-bold">AES-256-GCM</span>
+                            <span class="text-slate-500 flex-grow border-b border-dashed border-emerald-500/50 h-2"></span>
+                            <span class="bg-neutral-900 px-1 py-0.5 rounded text-cyan-400 border border-neutral-800" id="vpn-endpoint">US-EST-PROX</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 text-[9px] mono mt-0.5">
+                        <div class="bg-neutral-900/40 p-1.5 border border-neutral-900 rounded">
+                            <span class="text-slate-500 block">TUNNEL EGRESS:</span>
+                            <span class="text-slate-300 font-semibold" id="bytes-sent">12,483.2 KB</span>
+                        </div>
+                        <div class="bg-neutral-900/40 p-1.5 border border-neutral-900 rounded">
+                            <span class="text-slate-500 block">TUNNEL INGRESS:</span>
+                            <span class="text-slate-300 font-semibold" id="bytes-recv">89,245.9 KB</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MIDDLE SECTION: SYSTEM DIAGNOSTIC RUN (Col: 5) -->
+            <section class="lg:col-span-5 flex flex-col gap-4">
+                
+                <!-- SCANNER AND SEQUENCING CONTROLLER -->
+                <div class="bg-neutral-950/85 border border-neutral-800 rounded-xl p-4 flex flex-col gap-4 relative overflow-hidden backdrop-blur-md flex-grow" id="central-card">
+                    <div class="absolute -right-16 -top-16 w-48 h-48 bg-cyan-500/5 rounded-full blur-2xl pointer-events-none"></div>
+
+                    <div class="flex items-center justify-between border-b border-neutral-900 pb-2">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-cyan-500 animate-spin" style="animation-duration: 4s;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            </svg>
+                            <h2 class="text-xs font-bold tracking-wider text-slate-200 uppercase">Sequential CoreNetwork Diagnostics</h2>
+                        </div>
+                        <div class="text-[9px] mono text-slate-500" id="current-module-index">PROBE: 01/18</div>
+                    </div>
+
+                    <!-- Diagnostic Core Scroller -->
+                    <div id="module-scroller" class="flex-grow space-y-2 max-h-[360px] overflow-y-auto pr-1 relative">
+                        <!-- Items injected dynamically -->
+                    </div>
+
+                    <!-- Diagnostics Main Progress Controls -->
+                    <div class="border-t border-neutral-900 pt-3 flex items-center justify-between gap-4">
+                        <div class="flex-grow">
+                            <div class="flex justify-between text-[9px] mono text-slate-500 mb-1">
+                                <span>AGGREGATE CORE AUDIT COMPLETE</span>
+                                <span id="master-scan-pct" class="font-bold">0%</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-neutral-950 border border-neutral-900 rounded-full overflow-hidden">
+                                <div id="master-scan-bar" class="h-full bg-gradient-to-r from-cyan-600 via-blue-500 to-emerald-400 w-0 transition-all duration-300"></div>
+                            </div>
+                        </div>
+
+                        <button onclick="emergencyTrigger()" class="bg-red-950/20 hover:bg-red-950/40 border border-red-500/40 text-red-400 px-3 py-1.5 rounded-lg text-[10px] font-semibold uppercase tracking-wider mono transition-all duration-200 shrink-0">
+                            Bypass System
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- RIGHT SECTION: SECURE ENCLAVE & ACCESS SECURITY (Col: 4) -->
+            <section class="lg:col-span-4 flex flex-col gap-4">
+                
+                <!-- CO-3: APPLE ID SIGNATURE ENGINE -->
+                <div class="bg-neutral-950/85 border border-neutral-800 rounded-xl p-4 flex flex-col gap-3 relative overflow-hidden backdrop-blur-md flex-1 min-h-[220px]" id="appleid-card">
+                    <div class="flex items-center justify-between border-b border-neutral-900 pb-2">
+                        <h2 class="text-xs font-semibold tracking-wider text-slate-300 uppercase flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse"></span>
+                            SecKeychain Cryptography
+                        </h2>
+                        <span class="text-[9px] text-slate-500 mono">SEC_AGENT_v11</span>
+                    </div>
+
+                    <div class="space-y-3 my-1 flex-grow">
+                        <div>
+                            <div class="flex justify-between text-[10px] mono text-slate-400 mb-0.5">
+                                <span>Apple ID Cryptographic Signature:</span>
+                                <span class="text-slate-200 font-semibold" id="appleid-email">d*****@icloud.com</span>
+                            </div>
+                            <div class="text-[8.5px] mono text-neutral-500">SecTrust Handshake Signature: <span id="appleid-hash" class="text-slate-400">0x3F2B...E041</span></div>
+                        </div>
+
+                        <div class="bg-black/60 border border-neutral-900 rounded-lg p-2.5">
+                            <span class="text-[8.5px] text-slate-500 block uppercase mono mb-1">Authenticated Local Peer Devices</span>
+                            <div class="space-y-1.5 font-mono text-[9.5px]" id="secure-pool-list">
+                                <div class="flex justify-between items-center text-slate-300">
+                                    <span>📱 Local iPhone Device</span>
+                                    <span class="text-emerald-500 font-semibold">LOCAL_HOST</span>
+                                </div>
+                                <div class="flex justify-between items-center text-slate-400">
+                                    <span>💻 MacBook Pro 16" (M4)</span>
+                                    <span class="text-slate-500">PEER_SECURE</span>
+                                </div>
+                                <div class="flex justify-between items-center text-slate-400">
+                                    <span>⌚ Apple Watch Ultra 3</span>
+                                    <span class="text-slate-500">PEER_PROX</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-cyan-950/10 border border-cyan-800/20 rounded-lg p-2 text-center" id="icloud-sync-box">
+                        <span class="text-[9.5px] text-cyan-400 font-semibold uppercase tracking-wider mono">iCloud Security Certificate Match Verified</span>
+                    </div>
+                </div>
+
+                <!-- CO-4: SANDBOXED ANOMALY MONITOR -->
+                <div class="bg-neutral-950/85 border border-neutral-800 rounded-xl p-4 flex flex-col gap-3 relative overflow-hidden backdrop-blur-md flex-1 min-h-[220px]" id="malware-card">
+                    <div class="flex items-center justify-between border-b border-neutral-900 pb-2">
+                        <h2 class="text-xs font-semibold tracking-wider text-slate-300 uppercase flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse"></span>
+                            SecHost Sandboxing & Anomaly Detection
+                        </h2>
+                        <span class="text-[9px] text-slate-500 mono">SECURE_ROOT</span>
+                    </div>
+
+                    <div class="space-y-3.5 my-1 flex-grow">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-slate-400 mono">FIPS Cryptographic Check:</span>
+                            <span class="mono text-emerald-400 font-semibold" id="integrity-text">FIPS 140-3 COMPLIANT</span>
+                        </div>
+
+                        <!-- Technical Sweep Display -->
+                        <div class="flex gap-3 bg-black/60 rounded-lg p-2 border border-neutral-900 items-center">
+                            <div class="w-12 h-12 rounded-full border border-cyan-500/20 relative overflow-hidden bg-cyan-950/10 shrink-0" id="radar-container">
+                                <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 border-t border-cyan-500/10"></div>
+                                <div class="absolute inset-y-0 left-1/2 -translate-x-1/2 border-l border-cyan-500/10"></div>
+                                <div class="absolute inset-1.5 rounded-full border border-cyan-500/5"></div>
+                                <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-transparent to-cyan-400/20 radar-line"></div>
+                            </div>
+                            <div class="mono text-[9px] space-y-0.5 flex-grow">
+                                <span class="text-slate-500 block uppercase font-bold tracking-wider">Dynamic Sandbox Monitor</span>
+                                <div class="text-slate-300 flex items-center gap-1 font-semibold">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+                                    <span id="threat-radar-status">Scanning active syscall structures...</span>
+                                </div>
+                                <div class="text-[8px] text-slate-500">Signatures Database v1294</div>
+                            </div>
+                        </div>
+
+                        <div class="bg-neutral-900/50 p-2 border border-neutral-900 rounded-lg text-xs mono space-y-1">
+                            <div class="text-[9px] text-slate-500 uppercase tracking-wider font-semibold">Secure CoreLocation Telemetry</div>
+                            <div class="flex justify-between text-slate-400 text-[10px]">
+                                <span>CoreGPS Lat:</span>
+                                <span id="gps-lat" class="text-slate-200">35.6895° N</span>
+                            </div>
+                            <div class="flex justify-between text-slate-400 text-[10px]">
+                                <span>CoreGPS Lon:</span>
+                                <span id="gps-lon" class="text-slate-200">139.6917° E</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- BOTTOM PANEL: SYSTEM CONSOLE LOGS & COMPRESSED FRAME BUFFER -->
+        <footer class="grid grid-cols-1 md:grid-cols-12 gap-4">
+            
+            <!-- Terminal Log -->
+            <div class="md:col-span-7 bg-neutral-950/90 border border-neutral-800 rounded-xl p-4 flex flex-col gap-2 relative overflow-hidden backdrop-blur-md h-[180px]" id="terminal-panel">
+                <div class="flex items-center justify-between border-b border-neutral-900 pb-1.5">
+                    <span class="text-[9.5px] font-bold tracking-wider text-slate-400 uppercase flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse"></span>
+                        iOS Core Syslog Daemon (stdout)
+                    </span>
+                    <span class="text-[8.5px] text-slate-500 mono" id="term-rate">LOG_RATE: 12.4 kb/s</span>
+                </div>
+                
+                <div id="terminal-log" class="flex-grow overflow-y-auto mono text-[9.5px] text-cyan-400/90 space-y-1 pr-1">
+                    <!-- Dynamic logs injected -->
+                </div>
+            </div>
+
+            <!-- Packet Inspector -->
+            <div class="md:col-span-5 bg-neutral-950/90 border border-neutral-800 rounded-xl p-4 flex flex-col gap-2 relative overflow-hidden backdrop-blur-md h-[180px]" id="packet-panel">
+                <div class="flex items-center justify-between border-b border-neutral-900 pb-1.5">
+                    <span class="text-[9.5px] font-bold tracking-wider text-slate-400 uppercase">
+                        CoreTLS Packet Frame Header Offset
+                    </span>
+                    <span class="text-[8.5px] text-emerald-400 font-bold mono">RAW MEMORY</span>
+                </div>
+                <div class="flex-grow overflow-y-auto mono text-[9.5px] text-neutral-500 line-height-tight" id="packet-hex-box">
+                    <!-- Hex dumper output -->
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Web Audio API Synthesizer Component -->
+    <script>
+        let audioCtx = null;
+        let isMuted = true;
+        let alertInterval = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function toggleAudio() {
+            initAudio();
+            const btn = document.getElementById('audio-toggle-btn');
+            if (isMuted) {
+                isMuted = false;
+                btn.innerText = "Mute Audio";
+                btn.classList.add('bg-cyan-500/20', 'border-cyan-400');
+                playSynthTone(880, 0.05, 'sine');
+                setTimeout(() => playSynthTone(1200, 0.08, 'sine'), 50);
+            } else {
+                isMuted = true;
+                btn.innerText = "Enable Audio";
+                btn.classList.remove('bg-cyan-500/20', 'border-cyan-400');
+                if (alertInterval) {
+                    clearInterval(alertInterval);
+                    alertInterval = null;
+                }
+            }
+        }
+
+        function playSynthTone(freq, duration, type = 'sine', volume = 0.12) {
+            if (isMuted || !audioCtx) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                
+                gainNode.gain.setValueAtTime(volume, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                
+                osc.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (e) {}
+        }
+
+        function playDiagnosticSweep() {
+            if (isMuted || !audioCtx) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1600, audioCtx.currentTime + 0.8);
+                
+                gainNode.gain.setValueAtTime(0.06, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
+                
+                osc.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.8);
+            } catch (e) {}
+        }
+
+        function startEmergencySiren() {
+            if (isMuted || !audioCtx) return;
+            if (alertInterval) return;
+
+            alertInterval = setInterval(() => {
+                if (isMuted) return;
+                try {
+                    const osc = audioCtx.createOscillator();
+                    const gainNode = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(500, audioCtx.currentTime);
+                    osc.frequency.linearRampToValueAtTime(750, audioCtx.currentTime + 0.8);
+                    
+                    gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.9);
+                    
+                    osc.connect(gainNode);
+                    gainNode.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.9);
+                } catch (e) {}
+            }, 1000);
+        }
+    </script>
+
+    <!-- CORE INTERFACE LOGIC & SECURITY SIMULATION -->
+    <script>
+        // High fidelity iOS and Framework specific modules
+        const modules = [
+            { id: 'apple-id', label: 'Apple ID Secure Certificate Exchange', path: 'SecKeychainCopyMatching' },
+            { id: 'icloud', label: 'iCloud Security Sync Handshake', path: 'CKEncryptedRecordStore' },
+            { id: 'wifi', label: 'WLAN 802.11 Local Gateway Assessment', path: 'WiFiManagerClientConfig' },
+            { id: 'cellular', label: 'Cellular Carrier Tower Handshake', path: 'CoreTelephonyBasebandRoute' },
+            { id: 'dns', label: 'Local DNS Resolution Encryption Leak Test', path: 'dnssd_client_stub' },
+            { id: 'ip-trace', label: 'External Gateway IP Routing & Tracing', path: 'CFNetworkSocketBind' },
+            { id: 'bluetooth', label: 'Bluetooth RF Signal Proximity Audit', path: 'IOBluetoothDeviceScanner' },
+            { id: 'triangulation', label: 'Multi-tower Carrier GPS Triangulation', path: 'CLSimulationCoreGPS' },
+            { id: 'vpn', label: 'CoreTLS AES-256 IPsec Tunnel Verification', path: 'utunSecureSocketTunnel' },
+            { id: 'firewall', label: 'iOS Packet Filtering Engine Validation', path: 'BSD_pf_packet_filter' },
+            { id: 'malware', label: 'CoreTrust Integrity Code-Signature Scan', path: 'AMFI_Code_Signature' },
+            { id: 'darkweb', label: 'Secure Keychain Credential Leak Audit', path: 'SecPasswordAuditStore' },
+            { id: 'unauthorized', label: 'Local Security Enclave Authentication Audit', path: 'LocalAuthenticationEnclave' },
+            { id: 'interception', label: 'Transparent HTTP/S Interception Monitor', path: 'CFNetworkSSLHandshake' },
+            { id: 'privacy', label: 'Application Sandboxing & Entitlements Probe', path: 'XPCSandboxEntitlements' },
+            { id: 'gps', label: 'CoreLocation Hardware Signal Telemetry Check', path: 'CLLocationHardwareManager' },
+            { id: 'nearby', label: 'AWDL Network Intrusive Proximity Probe', path: 'AppleWirelessDirectLink' },
+            { id: 'encryption', label: 'Secure Socket Egress Data Packet Analysis', path: 'SecTrustEvaluateCertificate' }
+        ];
+
+        // Highly technical iOS syslog logs
+        const terminalLogBank = [
+            "configd[89]: <SecTrustEvaluate> TLS handshake cert validity confirmed successfully.",
+            "kernel[0]: AppleSiliconSEP: Secure Enclave Processor validated host configuration parameters.",
+            "WiFiManager[120]: Interface en0 (Wi-Fi) associated with gateway BSSID (F8:1E:DF:99:A2:01).",
+            "mDNSResponder[76]: dnssd_clientstub: connection established with client deamon config.",
+            "CoreTelephony[401]: Baseband subsystem registered network state parameters with PLMN (310-410).",
+            "kernel[0]: Sandbox Security Extension initialized successfully for subsystem: CFNetwork.",
+            "trustd[109]: Checked system keychain integrity... No unauthorized user trust roots detected.",
+            "SecureTransport[224]: CoreTLS established encrypted session with Apple Push Notification Service (APNs).",
+            "locationd[189]: Telemetry coordinates mapped with high horizontal accuracy confidence (8.4m).",
+            "kernel[0]: AppleSecurityShim: IPC interfaces locked. Sandbox rules applied to process boundaries."
+        ];
+
+        // Clinical warning logs for final state
+        const dangerLogBank = [
+            "kernel[0]: AMFI_Code_Signature: CRITICAL - Executable memory modification detected (PID: 8490).",
+            "securityd[142]: SecTrustEvaluate: Warning - Certificate chain validation failed. Local routing altered.",
+            "CoreTelephony[401]: Baseband: Error - Detected false baseband tower emulator connection.",
+            "configd[89]: SecKeychainAudit: Warning - Unauthorized peer session token active on cloud partition.",
+            "trustd[109]: Compromised trust root identified: 'Root_Mexico_Tunnel_Relay_091' (Unauthorized).",
+            "SecureTransport[224]: Warning - External decrypted packet sniff signature intercepted in sector 4.",
+            "locationd[189]: CoreGPS: Anomaly - Satellite triangulation coordinates differ from network triangulation."
+        ];
+
+        let bootInterval = null;
+        let bootProgress = 0;
+        let activeScanning = false;
+        let currentScanModuleIndex = 0;
+        let terminalInterval = null;
+        let packetInterval = null;
+        let signalUpdateInterval = null;
+        
+        // Timing Parameters for precisely 1 minute scan cycle
+        // 18 modules * 3000ms per scan + 17 intermediate breaks of 330ms = 59,610ms (approx 1 min)
+        const MODULE_SCAN_DURATION = 3000; 
+        const INTER_MODULE_DELAY = 330;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initBootloader();
+            initBackgroundCanvas();
+        });
+
+        // Initialize clean connected network canvas
+        function initBackgroundCanvas() {
+            const canvas = document.getElementById('gridCanvas');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resize);
+            resize();
+
+            for(let i=0; i<35; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * 0.4,
+                    vy: (Math.random() - 0.5) * 0.4,
+                    radius: Math.random() * 1.5 + 1
+                });
+            }
+
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                const isAlert = document.body.classList.contains('warning-mode');
+                
+                const pColor = isAlert ? 'rgba(239, 68, 68, 0.4)' : 'rgba(6, 182, 212, 0.4)';
+                const lColor = isAlert ? 'rgba(239, 68, 68, 0.05)' : 'rgba(6, 182, 212, 0.05)';
+
+                ctx.strokeStyle = lColor;
+                ctx.lineWidth = 0.5;
+                for(let i=0; i<particles.length; i++) {
+                    for(let j=i+1; j<particles.length; j++) {
+                        const dist = Math.hypot(particles[i].x - particles[j].x, particles[i].y - particles[j].y);
+                        if (dist < 180) {
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.stroke();
+                        }
+                    }
+                }
+
+                particles.forEach(p => {
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = pColor;
+                    ctx.fill();
+
+                    p.x += p.vx;
+                    p.y += p.vy;
+
+                    if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                    if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+                });
+
+                requestAnimationFrame(draw);
+            }
+            draw();
+        }
+
+        // Diagnostic System Boot Sequence
+        function initBootloader() {
+            const bootLogBox = document.getElementById('boot-log-box');
+            const bootBar = document.getElementById('boot-progress-bar');
+            const bootPct = document.getElementById('boot-status-pct');
+            
+            const bootStages = [
+                "INF: Parsing active hardware kernel attributes...",
+                "SEC: Secure Enclave Processor (SEP) handshake confirmed...",
+                "INF: Instantiating virtual network adapters (en0, pdp_ip0, awdl0, utun0)...",
+                "SEC: Checking FIPS-140 standard compliance libraries...",
+                "INF: Mapping core baseband firmware cryptographic keys...",
+                "SEC: Verifying sandbox configuration partitions...",
+                "INF: Setting up Secure Socket Handshake listeners...",
+                "SEC: Diagnostics controller fully online."
+            ];
+
+            let stageIndex = 0;
+            bootInterval = setInterval(() => {
+                bootProgress += Math.floor(Math.random() * 9) + 4;
+                if (bootProgress >= 100) {
+                    bootProgress = 100;
+                    clearInterval(bootInterval);
+                    
+                    setTimeout(() => {
+                        document.getElementById('bootloader').classList.add('opacity-0', 'pointer-events-none');
+                        document.getElementById('dashboard').classList.remove('opacity-0', 'pointer-events-none');
+                        playSynthTone(600, 0.35, 'sine', 0.15);
+                        startScanner();
+                    }, 500);
+                }
+
+                if (bootProgress % 12 === 0 || bootProgress % 11 === 0 || bootProgress >= 98) {
+                    if (stageIndex < bootStages.length) {
+                        const div = document.createElement('div');
+                        div.innerHTML = `[ <span class="text-cyan-400">STAGE_${stageIndex+1}</span> ] ${bootStages[stageIndex]}`;
+                        bootLogBox.appendChild(div);
+                        bootLogBox.scrollTop = bootLogBox.scrollHeight;
+                        stageIndex++;
+                        playSynthTone(520, 0.04, 'sine', 0.08);
+                    }
+                }
+
+                bootBar.style.width = bootProgress + '%';
+                bootPct.innerText = bootProgress + '%';
+            }, 80);
+        }
+
+        function startScanner() {
+            activeScanning = true;
+            generateDashboardBaseData();
+            initTerminalLogs();
+            initPacketDumper();
+            initSignalFluctuator();
+            buildScanModulesInScroller();
+            processNextModule();
+        }
+
+        function generateDashboardBaseData() {
+            const hexChars = '0123456789ABCDEF';
+            let hexHash = '0x';
+            for(let i=0; i<16; i++) {
+                hexHash += hexChars[Math.floor(Math.random() * 16)];
+            }
+            document.getElementById('appleid-hash').innerText = hexHash;
+            document.getElementById('random-node-id').innerText = "UNIT-" + Math.floor(Math.random()*8000+1000) + "-SEC";
+        }
+
+        setInterval(() => {
+            const now = new Date();
+            const year = now.getUTCFullYear();
+            const month = String(now.getUTCMonth() + 1).padStart(2, '0');
+            const day = String(now.getUTCDate()).padStart(2, '0');
+            const h = String(now.getUTCHours()).padStart(2, '0');
+            const m = String(now.getUTCMinutes()).padStart(2, '0');
+            const s = String(now.getUTCSeconds()).padStart(2, '0');
+            document.getElementById('live-time').innerText = `${year}-${month}-${day} ${h}:${m}:${s} UTC`;
+        }, 1000);
+
+        function buildScanModulesInScroller() {
+            const scroller = document.getElementById('module-scroller');
+            scroller.innerHTML = '';
+
+            modules.forEach((mod, index) => {
+                const item = document.createElement('div');
+                item.id = `mod-card-${index}`;
+                item.className = "bg-neutral-900/40 border border-neutral-900 rounded-lg p-2.5 flex flex-col gap-1 transition-all duration-300 relative overflow-hidden";
+                item.innerHTML = `
+                    <div class="flex items-center justify-between text-xs">
+                        <div class="flex items-center gap-2">
+                            <span id="mod-indicator-${index}" class="w-2 h-2 rounded-full bg-neutral-800 flex items-center justify-center text-[7px] text-black font-bold"></span>
+                            <span class="text-slate-300 uppercase tracking-wider text-[10.5px] font-medium">${mod.label}</span>
+                        </div>
+                        <span id="mod-status-label-${index}" class="text-[9.5px] text-neutral-500 font-mono tracking-wider">STANDBY</span>
+                    </div>
+
+                    <div class="w-full h-1 bg-neutral-950 rounded-full overflow-hidden mt-1 border border-neutral-900/50">
+                        <div id="mod-bar-${index}" class="h-full bg-cyan-500 w-0 transition-all duration-100"></div>
+                    </div>
+
+                    <div class="flex items-center justify-between text-[8.5px] mono text-neutral-500 mt-1">
+                        <span>API Context: ${mod.path}</span>
+                        <span id="mod-hex-stream-${index}">MEM_REF: 0x00000000</span>
+                    </div>
+                `;
+                scroller.appendChild(item);
+            });
+        }
+
+        // Sequential Scan Processing (Engineered to complete in exactly 1 minute total)
+        function processNextModule() {
+            if (currentScanModuleIndex >= modules.length) {
+                activeScanning = false;
+                setTimeout(() => {
+                    initiateCompromisedAlert();
+                }, 800);
+                return;
+            }
+
+            const index = currentScanModuleIndex;
+            document.getElementById('current-module-index').innerText = `PROBE: ${String(index+1).padStart(2, '0')}/18`;
+            
+            playDiagnosticSweep();
+
+            const card = document.getElementById(`mod-card-${index}`);
+            const indicator = document.getElementById(`mod-indicator-${index}`);
+            const statusLabel = document.getElementById(`mod-status-label-${index}`);
+            const progressBar = document.getElementById(`mod-bar-${index}`);
+            const hexStream = document.getElementById(`mod-hex-stream-${index}`);
+
+            card.classList.add('border-cyan-500/30', 'bg-cyan-950/5');
+            indicator.className = "w-2 h-2 rounded-full bg-cyan-400 animate-pulse";
+            statusLabel.innerText = "TESTING";
+            statusLabel.classList.add('text-cyan-400');
+            statusLabel.classList.remove('text-neutral-500');
+
+            addTerminalEntry(`configd[89]: Initiating system integrity call on: [${modules[index].path}]`);
+
+            let progress = 0;
+            const hexChars = 'ABCDEF0123456789';
+            
+            // Sub-interval ticks to complete over exactly 3000ms (3 seconds)
+            const tickRate = 50; 
+            const totalTicks = MODULE_SCAN_DURATION / tickRate;
+            const incrementPerTick = 100 / totalTicks;
+
+            const interval = setInterval(() => {
+                progress += incrementPerTick;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    
+                    card.classList.remove('border-cyan-500/30', 'bg-cyan-950/5');
+                    card.classList.add('border-emerald-500/20', 'bg-emerald-950/5');
+                    
+                    indicator.className = "w-2 h-2 rounded-full bg-emerald-500";
+                    
+                    statusLabel.innerText = "PASSED";
+                    statusLabel.classList.remove('text-cyan-400');
+                    statusLabel.classList.add('text-emerald-400');
+
+                    const overallPercent = Math.round(((index + 1) / modules.length) * 100);
+                    document.getElementById('master-scan-pct').innerText = `${overallPercent}%`;
+                    document.getElementById('master-scan-bar').style.width = `${overallPercent}%`;
+
+                    addTerminalEntry(`trustd[109]: [${modules[index].path}] return value: Verification succeeded.`);
+                    playSynthTone(700, 0.05, 'sine', 0.08);
+
+                    currentScanModuleIndex++;
+                    setTimeout(processNextModule, INTER_MODULE_DELAY);
+                }
+
+                let mockOffset = '0x';
+                for(let i=0; i<8; i++) mockOffset += hexChars[Math.floor(Math.random()*16)];
+                hexStream.innerText = `MEM_REF: ${mockOffset}`;
+
+                progressBar.style.width = `${progress}%`;
+            }, tickRate);
+        }
+
+        function initTerminalLogs() {
+            terminalLogBank.forEach(log => {
+                addTerminalEntry(log);
+            });
+
+            terminalInterval = setInterval(() => {
+                if (activeScanning) {
+                    const rnd = Math.random();
+                    if (rnd > 0.4) {
+                        const randomLog = terminalLogBank[Math.floor(Math.random() * terminalLogBank.length)];
+                        addTerminalEntry(randomLog);
+                    }
+                }
+            }, 1500);
+        }
+
+        function addTerminalEntry(text) {
+            const term = document.getElementById('terminal-log');
+            const p = document.createElement('p');
+            const now = new Date();
+            const timestamp = `${String(now.getUTCHours()).padStart(2, '0')}:${String(now.getUTCMinutes()).padStart(2, '0')}:${String(now.getUTCSeconds()).padStart(2, '0')}.${String(now.getUTCMilliseconds()).padStart(3, '0')}`;
+            p.innerHTML = `<span class="text-slate-500">[${timestamp}]</span> ${text}`;
+            term.appendChild(p);
+            term.scrollTop = term.scrollHeight;
+
+            if (term.childNodes.length > 50) {
+                term.removeChild(term.firstChild);
+            }
+        }
+
+        function initPacketDumper() {
+            const box = document.getElementById('packet-hex-box');
+            const hexChars = '0123456789ABCDEF ';
+            
+            packetInterval = setInterval(() => {
+                let textLine = '';
+                const offset = '0x' + Math.floor(Math.random()*9000+1000).toString(16).toUpperCase();
+                for (let i = 0; i < 20; i++) {
+                    textLine += hexChars[Math.floor(Math.random() * hexChars.length)];
+                }
+                const p = document.createElement('div');
+                p.className = 'hover:text-cyan-400 transition-colors cursor-default';
+                p.innerHTML = `<span class="text-neutral-500">${offset}:</span>  ${textLine}`;
+                box.appendChild(p);
+                box.scrollTop = box.scrollHeight;
+
+                if (box.childNodes.length > 20) {
+                    box.removeChild(box.firstChild);
+                }
+            }, 150);
+        }
+
+        function initSignalFluctuator() {
+            const path = document.getElementById('waveform');
+            let offset = 0;
+
+            signalUpdateInterval = setInterval(() => {
+                const isWarning = document.body.classList.contains('warning-mode');
+                const amplitude = isWarning ? 28 : 10;
+                const freqDiv = isWarning ? 20 : 50;
+                
+                offset += 0.2;
+                let d = `M 0 40 `;
+                for(let x = 0; x <= 300; x += 10) {
+                    const y = 40 + Math.sin((x / freqDiv) + offset) * amplitude;
+                    d += `L ${x} ${y} `;
+                }
+                path.setAttribute('d', d);
+
+                if (isWarning) {
+                    document.getElementById('ant-dbm-1').innerText = `-${Math.floor(Math.random()*15 + 115)} dBm`;
+                    document.getElementById('ant-dbm-2').innerText = `-${Math.floor(Math.random()*20 + 110)} dBm`;
+                    document.getElementById('ping-text').innerText = `${(Math.random()*120 + 200).toFixed(1)} ms`;
+                    document.getElementById('instability-text').innerText = `${(Math.random()*10 + 15).toFixed(2)}%`;
+                } else {
+                    document.getElementById('ant-dbm-1').innerText = `-${Math.floor(Math.random()*4 + 80)} dBm`;
+                    document.getElementById('ant-dbm-2').innerText = `-${Math.floor(Math.random()*5 + 88)} dBm`;
+                    document.getElementById('ping-text').innerText = `${(Math.random()*10 + 30).toFixed(1)} ms`;
+                    document.getElementById('instability-text').innerText = `${(Math.random()*0.02 + 0.01).toFixed(3)}%`;
+                }
+
+                const outB = parseFloat(document.getElementById('bytes-sent').innerText.replace(/,/g, ''));
+                const inB = parseFloat(document.getElementById('bytes-recv').innerText.replace(/,/g, ''));
+                document.getElementById('bytes-sent').innerText = (outB + Math.random()*2).toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}) + ' KB';
+                document.getElementById('bytes-recv').innerText = (inB + Math.random()*15).toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}) + ' KB';
+
+            }, 100);
+        }
+
+        // ==========================================
+        // COMPROMISED SCREEN EMISSION
+        // ==========================================
+        function initiateCompromisedAlert() {
+            document.body.classList.add('warning-mode', 'alert-active');
+            
+            startEmergencySiren();
+
+            // Shift Header to high importance clean red alerts (no glitches)
+            const header = document.getElementById('header-panel');
+            header.classList.remove('border-neutral-800');
+            header.classList.add('glow-red', 'bg-red-950/20');
+            
+            document.getElementById('header-title').innerHTML = `
+                <span class="text-red-500 font-bold tracking-widest uppercase">CRITICAL SYSTEM THREAT DETECTED</span>
+            `;
+            document.getElementById('header-glow').className = "absolute top-0 left-0 right-0 h-[1px] bg-red-500";
+            document.getElementById('header-radial-box').className = "w-9 h-9 rounded-full border border-red-500/50 flex items-center justify-center bg-red-950/20 relative";
+            document.getElementById('header-radial-box').innerHTML = `
+                <span class="absolute inset-0 rounded-full border border-transparent border-t-red-500 animate-spin"></span>
+                <span class="text-red-500 text-xs font-bold font-mono">!</span>
+            `;
+            document.getElementById('global-status-text').innerText = "CRITICAL ASSESSMENT ACTION REQUIRED";
+            document.getElementById('global-status-text').className = "text-[9px] text-red-500 font-bold tracking-wider";
+
+            // Cellular Card warning transition
+            const sigCard = document.getElementById('signal-card');
+            sigCard.classList.remove('border-neutral-800');
+            sigCard.classList.add('border-red-900/40', 'bg-red-950/5');
+            document.getElementById('sig-carrier').innerText = "ROUTING_BREACH";
+            document.getElementById('sig-carrier').className = "text-[9px] text-red-500 font-bold mono";
+            document.getElementById('waveform').setAttribute('stroke', '#ef4444');
+            document.getElementById('ping-bar').className = "h-full bg-red-500 w-[92%]";
+            document.getElementById('instability-bar').className = "h-full bg-red-500 w-[78%]";
+
+            // Wi-Fi / VPN degradation
+            const wifiCard = document.getElementById('wifi-card');
+            wifiCard.classList.remove('border-neutral-800');
+            wifiCard.classList.add('border-red-900/40', 'bg-red-950/5');
+            document.getElementById('wifi-status').innerText = "VULNERABLE";
+            document.getElementById('wifi-status').className = "text-[9px] text-red-500 font-bold mono";
+            document.getElementById('wifi-ssid').innerText = "UNAUTHORIZED_BASE_STATION";
+            document.getElementById('wifi-ssid').className = "mono text-red-400 font-bold";
+            document.getElementById('wifi-ip').className = "mono text-red-400 font-semibold";
+            document.getElementById('vpn-tag').innerText = "TUNNEL_TERMINATED";
+            document.getElementById('vpn-tag').className = "text-red-500 font-bold";
+            document.getElementById('vpn-endpoint').innerText = "FOREIGN-RELAY";
+            document.getElementById('vpn-endpoint').className = "bg-neutral-900 px-1 py-0.5 rounded text-red-400 border border-red-950 font-bold";
+
+            // Unauthorized peer modifications
+            document.getElementById('secure-pool-list').innerHTML = `
+                <div class="flex justify-between items-center text-[9.5px] mono text-red-400">
+                    <span>📱 Local iPhone Device</span>
+                    <span class="text-red-500 font-bold">BASEBAND_INTERCEPT</span>
+                </div>
+                <div class="flex justify-between items-center text-[9.5px] mono text-red-400">
+                    <span>💻 MacBook Pro 16" (M4)</span>
+                    <span class="text-red-500">FORCED_DISCONNECT</span>
+                </div>
+                <div class="flex justify-between items-center text-[9.5px] mono text-red-500 font-bold">
+                    <span>⚠️ External Unknown Host (RU)</span>
+                    <span class="text-red-500 animate-pulse">ACTIVE_HIJACK</span>
+                </div>
+            `;
+            document.getElementById('icloud-sync-box').className = "bg-red-950/20 border border-red-500/40 rounded-lg p-2 text-center";
+            document.getElementById('icloud-sync-box').innerHTML = `
+                <span class="text-[9.5px] text-red-400 font-bold uppercase tracking-wider mono">SecKeychain Envelope Integrity: COMPROMISED</span>
+            `;
+
+            // Threat analysis update
+            document.getElementById('integrity-text').innerText = "INTEGRITY_CHECK_FAILED";
+            document.getElementById('integrity-text').className = "mono text-red-500 font-bold";
+            document.getElementById('threat-radar-status').innerText = "ACTIVE ANOMALIES LOGGED";
+            document.getElementById('threat-radar-status').className = "text-red-400 font-bold";
+
+            // Push precise system warnings
+            dangerLogBank.forEach(log => {
+                addTerminalEntry(log);
+            });
+            document.getElementById('terminal-panel').classList.add('border-red-950', 'bg-red-950/10');
+            document.getElementById('terminal-log').className = "flex-grow overflow-y-auto mono text-[9.5px] text-red-400/90 space-y-1 pr-1";
+            document.getElementById('packet-hex-box').className = "flex-grow overflow-y-auto mono text-[9.5px] text-red-500/70 line-height-tight";
+
+            renderOverridingAlertPanel();
+        }
+
+        function emergencyTrigger() {
+            initAudio();
+            addTerminalEntry("kernel[0]: USER_INITIATED_OVERRIDE: Forcing security assessment execution bypass.");
+            playSynthTone(180, 0.35, 'triangle', 0.2);
+            initiateCompromisedAlert();
+        }
+
+        // Warning Results Dashboard (with Requested Transaction Injections)
+        function renderOverridingAlertPanel() {
+            const centerCard = document.getElementById('central-card');
+            centerCard.classList.remove('border-neutral-800');
+            centerCard.classList.add('border-red-500', 'bg-neutral-950', 'glow-red');
+            centerCard.style.zIndex = "40";
+
+            centerCard.innerHTML = `
+                <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-red-950/20 via-black to-black pointer-events-none"></div>
+
+                <div class="relative z-10 flex flex-col h-full justify-between gap-3">
+                    
+                    <!-- ALERT HEADER -->
+                    <div class="text-center space-y-1 border-b border-red-950 pb-2">
+                        <div class="inline-flex items-center gap-2 px-2.5 py-0.5 bg-red-500/10 text-red-400 border border-red-500/30 rounded-full text-[8.5px] font-bold tracking-widest mono uppercase">
+                            ⚠️ THREAT DISCOVERY HIGH SEVERITY
+                        </div>
+                        <h2 class="text-base font-bold tracking-wider text-red-500 uppercase mt-1">
+                            CRITICAL NETWORK STATUS
+                        </h2>
+                    </div>
+
+                    <!-- CLINICAL SECURE BULLETIN RESULTS -->
+                    <div class="bg-red-950/10 border border-red-900/30 rounded-lg p-3 space-y-2 max-h-[180px] overflow-y-auto">
+                        
+                        <!-- NEW TRANSACTION ALERT SECTION -->
+                        <div class="bg-red-900/20 border border-red-500/30 rounded p-2 text-xs">
+                            <strong class="text-red-400 uppercase tracking-wider text-[10px] block font-bold mb-1">🚨 UNAUTHORIZED Apple Pay SESSION ACTIVE</strong>
+                            <span class="text-[9.5px] text-slate-300 block">The baseband hijacking tunnel initialized 3 unauthorized pending payment authorizations:</span>
+                            <div class="flex gap-2.5 mt-1.5 font-mono text-[10.5px]">
+                                <span class="bg-red-950 px-2 py-0.5 border border-red-800/60 rounded text-red-400 font-semibold">$756.99</span>
+                                <span class="bg-red-950 px-2 py-0.5 border border-red-800/60 rounded text-red-400 font-semibold">$248.99</span>
+                                <span class="bg-red-950 px-2 py-0.5 border border-red-800/60 rounded text-red-400 font-semibold">$450.84</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-2 text-xs">
+                            <span class="text-red-500 shrink-0 mt-0.5">⚠️</span>
+                            <div>
+                                <strong class="text-red-400 uppercase tracking-wider text-[10px] block font-bold">Phone network compromised</strong>
+                                <span class="text-[9px] text-slate-400">External baseband hardware interception has spoofed the primary cell routing nodes.</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-2 text-xs">
+                            <span class="text-red-500 shrink-0 mt-0.5">⚠️</span>
+                            <div>
+                                <strong class="text-red-400 uppercase tracking-wider text-[10px] block font-bold">Multiple unauthorized logins detected</strong>
+                                <span class="text-[9px] text-slate-400">Cryptographic remote tokens generated from non-peer IP clusters have gained access.</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-2 text-xs">
+                            <span class="text-red-500 shrink-0 mt-0.5">⚠️</span>
+                            <div>
+                                <strong class="text-red-400 uppercase tracking-wider text-[10px] block font-bold">Apple ID session hijacking suspected</strong>
+                                <span class="text-[9px] text-slate-400">Valid keychain certificates extracted via cross-tunnel memory leak exploits.</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-2 text-xs">
+                            <span class="text-red-500 shrink-0 mt-0.5">⚠️</span>
+                            <div>
+                                <strong class="text-red-400 uppercase tracking-wider text-[10px] block font-bold">Privacy breaches identified</strong>
+                                <span class="text-[9px] text-slate-400">Sensitive data partitions actively targeted during unauthorized TLS tunneling.</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-2 text-xs">
+                            <span class="text-red-500 shrink-0 mt-0.5">⚠️</span>
+                            <div>
+                                <strong class="text-red-400 uppercase tracking-wider text-[10px] block font-bold">Malware signatures detected</strong>
+                                <span class="text-[9px] text-slate-400">Polymorphic footprint matching known active baseband interception modules.</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-2 text-xs">
+                            <span class="text-red-500 shrink-0 mt-0.5">⚠️</span>
+                            <div>
+                                <strong class="text-red-400 uppercase tracking-wider text-[10px] block font-bold">Encrypted traffic interception found</strong>
+                                <span class="text-[9px] text-slate-400">CoreTLS SSL verification checks bypassed by transparent gateway routing proxies.</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-2 text-xs">
+                            <span class="text-red-500 shrink-0 mt-0.5">⚠️</span>
+                            <div>
+                                <strong class="text-red-400 uppercase tracking-wider text-[10px] block font-bold">Remote access vulnerability active</strong>
+                                <span class="text-[9px] text-slate-400">Active socket bindings executing outbound telemetry packets to suspicious locations.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- THREAT VECTOR GEOLOCATIONS -->
+                    <div class="bg-black/90 border border-red-950 p-2 rounded-lg">
+                        <span class="text-[8px] mono text-red-500 font-bold block uppercase tracking-widest mb-1">Detected Intrusion Locations</span>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-1.5 text-[9px] mono text-center">
+                            <div class="bg-red-950/10 border border-red-900/20 p-1 rounded">
+                                <span class="text-red-400 block font-bold">Mexico</span>
+                                <span class="text-slate-500 text-[8px]">189.143.2.11</span>
+                            </div>
+                            <div class="bg-red-950/10 border border-red-900/20 p-1 rounded">
+                                <span class="text-red-400 block font-bold">Alabama</span>
+                                <span class="text-slate-500 text-[8px]">172.90.114.2</span>
+                            </div>
+                            <div class="bg-red-950/10 border border-red-900/20 p-1 rounded">
+                                <span class="text-red-400 block font-bold">New Jersey</span>
+                                <span class="text-slate-500 text-[8px]">68.32.19.143</span>
+                            </div>
+                            <div class="bg-red-950/10 border border-red-900/20 p-1 rounded">
+                                <span class="text-red-400 block font-bold">Russia</span>
+                                <span class="text-slate-500 text-[8px]">185.12.92.110</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ALERT SUMMARY CALLOUTS -->
+                    <div class="bg-red-900/10 border border-red-500/20 rounded p-2 flex flex-wrap justify-between text-[8px] mono text-red-400 font-semibold gap-1">
+                        <span>• Unknown devices connected</span>
+                        <span>• Sensitive data exposure risk</span>
+                        <span>• Network integrity failed</span>
+                        <span>• Immediate action recommended</span>
+                    </div>
+
+                    <!-- REMEDIAL CALL-TO-ACTIONS -->
+                    <div class="border-t border-red-950 pt-2 flex flex-col sm:flex-row gap-2">
+                        <button onclick="rebootSimulation()" class="flex-grow bg-red-600 hover:bg-red-500 text-white font-bold py-1.5 px-3 rounded-lg text-[10px] tracking-wider uppercase transition-colors">
+                            Initialize Isolation Protocol
+                        </button>
+                        <button onclick="dismissSimulation()" class="bg-neutral-900 hover:bg-neutral-800 border border-red-950 text-red-400 font-mono py-1.5 px-3 rounded-lg text-[10px] tracking-wider uppercase transition-colors">
+                            Dismiss Threat
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function rebootSimulation() {
+            initAudio();
+            if (alertInterval) {
+                clearInterval(alertInterval);
+                alertInterval = null;
+            }
+            playSynthTone(600, 0.4, 'sine', 0.2);
+            
+            document.body.classList.remove('warning-mode', 'alert-active');
+            
+            const centerCard = document.getElementById('central-card');
+            centerCard.classList.remove('border-red-500', 'bg-neutral-950', 'glow-red');
+            centerCard.classList.add('border-neutral-800');
+            
+            bootProgress = 0;
+            currentScanModuleIndex = 0;
+            activeScanning = false;
+            
+            document.getElementById('bootloader').classList.remove('opacity-0', 'pointer-events-none');
+            document.getElementById('dashboard').classList.add('opacity-0', 'pointer-events-none');
+            initBootloader();
+        }
+
+        function dismissSimulation() {
+            initAudio();
+            playSynthTone(220, 0.2, 'triangle', 0.1);
+            
+            if (alertInterval) {
+                clearInterval(alertInterval);
+                alertInterval = null;
+            }
+
+            const centerCard = document.getElementById('central-card');
+            centerCard.innerHTML = `
+                <div class="flex items-center justify-between border-b border-red-950 pb-2 mb-3">
+                    <h2 class="text-xs font-semibold text-red-500 uppercase flex items-center gap-2">
+                        SYSTEM STATUS: MANUALLY DEFERRED
+                    </h2>
+                    <span class="text-[9px] text-slate-500 mono">OVERRIDDEN</span>
+                </div>
+                <div class="flex-grow flex flex-col items-center justify-center text-center p-6 bg-red-950/5 border border-red-900/20 rounded-xl relative overflow-hidden">
+                    <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-red-500/5 via-transparent to-transparent"></div>
+                    <span class="text-3xl mb-3">⚠️</span>
+                    <h3 class="font-bold text-red-500 uppercase tracking-widest text-[12px] mb-1">AUDIT ALERT IGNORED</h3>
+                    <p class="text-[10px] text-slate-400 max-w-sm mb-4">Underlying TLS exceptions and baseband tower anomalies remain unmitigated. Your connection properties might be insecure.</p>
+                    <button onclick="rebootSimulation()" class="bg-red-500/10 hover:bg-red-500/20 border border-red-500/40 text-red-400 font-semibold px-4 py-1.5 rounded text-[10px] uppercase tracking-wider mono transition-colors">
+                        Re-run Diagnostic Core
+                    </button>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
