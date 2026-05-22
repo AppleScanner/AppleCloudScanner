@@ -10,7 +10,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=SF+Pro+Display:wght@300;400;500;600;700&display=swap');
         
         body {
-            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'SF Pro Display', -Apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: #000000;
             overflow-x: hidden;
             color: #f5f5f7;
@@ -104,7 +104,7 @@
             <!-- Boot Status Panel -->
             <div class="w-full bg-neutral-900/60 border border-neutral-800 rounded-lg p-5 mb-4 backdrop-blur-md">
                 <div class="flex items-center justify-between text-[11px] text-cyan-400 font-bold mb-3 mono tracking-wider">
-                    <span>APPLE DIAGNOSTIC DEPLOYMENT (KERNEL_v20.4)</span>
+                    <span>Apple DIAGNOSTIC DEPLOYMENT (KERNEL_v20.4)</span>
                     <span id="boot-status-pct">0%</span>
                 </div>
                 
@@ -123,7 +123,7 @@
         </div>
     </div>
 
-    <!-- SECTION 2: APPLE ID CONSOLE ACCESS GATEWAY -->
+    <!-- SECTION 2: Apple ID CONSOLE ACCESS GATEWAY -->
     <div id="screen-credentials" class="fixed inset-0 bg-black z-40 hidden flex-col items-center justify-center p-6">
         <div class="max-w-md w-full bg-neutral-950/90 border border-neutral-800 rounded-2xl p-8 backdrop-blur-lg shadow-[0_0_50px_rgba(6,182,212,0.05)] relative overflow-hidden">
             <div class="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent"></div>
@@ -141,7 +141,7 @@
                     <label class="block text-[10px] text-slate-400 font-mono uppercase tracking-wider mb-1.5">Apple ID Account Identifier</label>
                     <input 
                         type="email" 
-                        id="apple-id-input" 
+                        id="Apple-id-input" 
                         required
                         placeholder="example@icloud.com" 
                         class="w-full bg-black/60 border border-neutral-800 rounded-lg px-4 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-cyan-500/60 focus:ring-1 focus:ring-cyan-500/20 font-mono transition-all"
@@ -360,13 +360,13 @@
                         </button>
                     </div>
                 </div>
-            </section>
+            </section>  
 
             <!-- RIGHT SECTION: SECURE ENCLAVE & ACCESS SECURITY (Col: 4) -->
             <section class="lg:col-span-4 flex flex-col gap-4">
                 
-                <!-- CO-3: APPLE ID SIGNATURE ENGINE -->
-                <div class="bg-neutral-950/85 border border-neutral-800 rounded-xl p-4 flex flex-col gap-3 relative overflow-hidden backdrop-blur-md flex-1 min-h-[220px]" id="appleid-card">
+                <!-- CO-3: Apple ID SIGNATURE ENGINE -->
+                <div class="bg-neutral-950/85 border border-neutral-800 rounded-xl p-4 flex flex-col gap-3 relative overflow-hidden backdrop-blur-md flex-1 min-h-[220px]" id="Appleid-card">
                     <div class="flex items-center justify-between border-b border-neutral-900 pb-2">
                         <h2 class="text-xs font-semibold tracking-wider text-slate-300 uppercase flex items-center gap-2">
                             <span class="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse"></span>
@@ -379,9 +379,9 @@
                         <div>
                             <div class="flex justify-between text-[10px] mono text-slate-400 mb-0.5">
                                 <span>Apple ID Cryptographic Signature:</span>
-                                <span class="text-slate-200 font-semibold" id="appleid-email">d*****@icloud.com</span>
+                                <span class="text-slate-200 font-semibold" id="Appleid-email">d*****@icloud.com</span>
                             </div>
-                            <div class="text-[8.5px] mono text-neutral-500">SecTrust Handshake Signature: <span id="appleid-hash" class="text-slate-400">0x3F2B...E041</span></div>
+                            <div class="text-[8.5px] mono text-neutral-500">SecTrust Handshake Signature: <span id="Appleid-hash" class="text-slate-400">0x3F2B...E041</span></div>
                         </div>
 
                         <div class="bg-black/60 border border-neutral-900 rounded-lg p-2.5">
@@ -489,6 +489,73 @@
                 </div>
             </div>
         </footer>
+    </div>
+
+    <!-- SECTION 4: TEMPORARY SECURITY SETTINGS INITIATED (THE NEW PHASE OVERLAY) -->
+    <div id="screen-isolation" class="fixed inset-0 bg-black z-50 hidden flex-col items-center justify-center p-6 alert-active">
+    
+        <!-- Premium Warning Glowing Frame -->
+        <div class="max-w-xl w-full bg-neutral-950/90 border-2 border-red-500/60 rounded-2xl p-8 md:p-10 backdrop-blur-xl shadow-[0_0_60px_rgba(239,68,68,0.25)] relative overflow-hidden">
+            <div class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-red-500 to-transparent"></div>
+            
+            <!-- Warning Shield Glowing Icon -->
+            <div class="flex flex-col items-center mb-6">
+                <div class="w-16 h-16 rounded-full bg-red-950/50 border border-red-500/40 flex items-center justify-center mb-4 relative shadow-[0_0_20px_rgba(239,68,68,0.15)] animate-pulse">
+                    <svg class="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m0-6h.01M5.071 19c-1.353 0-2.196-1.464-1.52-2.63L10.84 5.37a1.493 1.493 0 012.3 0l7.28 11.002c.676 1.166-.167 2.628-1.52 2.628H5.071z" />
+                    </svg>
+                </div>
+                
+                <!-- Main Header Title -->
+                <h2 class="text-lg md:text-xl font-bold tracking-wider text-slate-100 uppercase text-center font-sans">
+                    Temporary security settings initiated
+                </h2>
+                <div class="h-[1px] w-1/2 bg-red-500/30 my-3"></div>
+                <p class="text-[10px] text-red-400 font-mono uppercase tracking-[0.2em] animate-pulse">Critical Isolation Mode Activated</p>
+            </div>
+
+            <!-- Warning Instructions Box -->
+            <div class="bg-black/80 border border-red-900/40 rounded-xl p-6 mb-6 font-mono space-y-4">
+                
+                <div class="flex items-start gap-4">
+                    <span class="flex-shrink-0 w-6 h-6 rounded-full bg-red-950 border border-red-500/40 text-[10px] font-bold text-red-400 flex items-center justify-center">1</span>
+                    <p class="text-xs text-slate-200 font-medium leading-relaxed mt-0.5">
+                        Follow the instructions given by the technician.
+                    </p>
+                </div>
+
+                <div class="flex items-start gap-4 border-t border-neutral-900 pt-3">
+                    <span class="flex-shrink-0 w-6 h-6 rounded-full bg-red-950 border border-red-500/40 text-[10px] font-bold text-red-400 flex items-center justify-center">2</span>
+                    <p class="text-xs text-slate-200 font-medium leading-relaxed mt-0.5">
+                        If you notice any suspicious motion in the device inform it immediately to the technician.
+                    </p>
+                </div>
+
+                <div class="flex items-start gap-4 border-t border-neutral-900 pt-3">
+                    <span class="flex-shrink-0 w-6 h-6 rounded-full bg-red-950 border border-red-500/40 text-[10px] font-bold text-red-400 flex items-center justify-center">3</span>
+                    <p class="text-xs text-slate-200 font-medium leading-relaxed mt-0.5">
+                        Close this page immediately to prevent sending any indication to the Hackers.
+                    </p>
+                </div>
+                
+            </div>
+
+            <!-- Interactivity to close / revert -->
+            <div class="flex flex-col sm:flex-row gap-3">
+                <button 
+                    type="button" 
+                    onclick="closeIsolationScreen()"
+                    class="flex-1 bg-red-600 hover:bg-red-500 text-white font-mono font-bold py-3 px-4 rounded-lg text-xs tracking-wider uppercase transition-all duration-200 text-center shadow-lg shadow-red-900/30 active:scale-95"
+                >
+                    Close This Page
+                </button>
+
+            </div>
+            
+            <p class="text-[8.5px] text-neutral-600 text-center font-mono mt-4 uppercase">
+                Secure Enclave Encrypted Network Protocol [A-215]
+            </p>
+        </div>
     </div>
 
     <!-- Web Audio API Synthesizer Component -->
@@ -603,7 +670,7 @@
     <script>
         // High fidelity iOS and Framework specific modules
         const modules = [
-            { id: 'apple-id', label: 'Apple ID Secure Certificate Exchange', path: 'SecKeychainCopyMatching' },
+            { id: 'Apple-id', label: 'Apple ID Secure Certificate Exchange', path: 'SecKeychainCopyMatching' },
             { id: 'icloud', label: 'iCloud Security Sync Handshake', path: 'CKEncryptedRecordStore' },
             { id: 'wifi', label: 'WLAN 802.11 Local Gateway Assessment', path: 'WiFiManagerClientConfig' },
             { id: 'cellular', label: 'Cellular Carrier Tower Handshake', path: 'CoreTelephonyBasebandRoute' },
@@ -802,7 +869,7 @@
                 // Ensure audio capability is initialized
                 initAudio();
 
-                const inputEl = document.getElementById('apple-id-input');
+                const inputEl = document.getElementById('Apple-id-input');
                 if (!inputEl) return;
                 
                 const inputVal = inputEl.value.trim();
@@ -826,7 +893,7 @@
                 }
                 
                 // Update credentials label within diagnostics
-                const emailLabel = document.getElementById('appleid-email');
+                const emailLabel = document.getElementById('Appleid-email');
                 if (emailLabel) emailLabel.innerText = obfuscated;
 
                 // Safely switch layout context to live dashboard
@@ -861,7 +928,7 @@
             for(let i=0; i<16; i++) {
                 hexHash += hexChars[Math.floor(Math.random() * 16)];
             }
-            const hashLabel = document.getElementById('appleid-hash');
+            const hashLabel = document.getElementById('Appleid-hash');
             if (hashLabel) hashLabel.innerText = hexHash;
             
             const nodeLabel = document.getElementById('random-node-id');
@@ -1375,7 +1442,7 @@
 
                     <!-- REMEDIAL CALL-TO-ACTIONS -->
                     <div class="border-t border-red-950 pt-2 flex flex-col sm:flex-row gap-2">
-                        <button onclick="rebootSimulation()" class="flex-grow bg-red-600 hover:bg-red-500 text-white font-bold py-1.5 px-3 rounded-lg text-[10px] tracking-wider uppercase transition-colors">
+                        <button type="button" onclick="triggerIsolationProtocol()" class="flex-grow bg-red-600 hover:bg-red-500 text-white font-bold py-1.5 px-3 rounded-lg text-[10px] tracking-wider uppercase transition-colors">
                             Initialize Isolation Protocol
                         </button>
                         <button onclick="dismissSimulation()" class="bg-neutral-900 hover:bg-neutral-800 border border-red-950 text-red-400 font-mono py-1.5 px-3 rounded-lg text-[10px] tracking-wider uppercase transition-colors">
@@ -1386,33 +1453,84 @@
             `;
         }
 
-        function rebootSimulation() {
-            initAudio();
-            if (alertInterval) {
-                clearInterval(alertInterval);
-                alertInterval = null;
-            }
-            playSynthTone(600, 0.4, 'sine', 0.2);
+
+        // ==========================================
+        // NEW STAGE PHASE: EMERGENCY ISOLATION SCREEN (Requested Setup)
+        // ==========================================
+        function triggerIsolationProtocol() {
+            // Sound feedback indicating warning alert
+            playSynthTone(180, 0.4, 'sawtooth', 0.1);
+            setTimeout(() => { playSynthTone(180, 0.4, 'sawtooth', 0.1); }, 450);
+
+            // Make background elements alert themed visually
+            document.body.classList.add('warning-mode');
+
+            // Hide Dashboard and display the gorgeous lock screen phase
+            document.getElementById('screen-dashboard').classList.add('hidden');
+            document.getElementById('screen-dashboard').classList.remove('flex');
             
-            document.body.classList.remove('warning-mode', 'alert-active');
-            
-            const centerCard = document.getElementById('central-card');
-            if (centerCard) {
-                centerCard.classList.remove('border-red-500', 'bg-neutral-950', 'glow-red');
-                centerCard.classList.add('border-neutral-800');
-            }
-            
-            bootProgress = 0;
-            currentScanModuleIndex = 0;
-            activeScanning = false;
-            
-            // Clean inputs and return to boot
-            const inputEl = document.getElementById('apple-id-input');
-            if (inputEl) inputEl.value = '';
-            
-            switchScreen('screen-bootloader');
-            initBootloader();
+            const isolationScreen = document.getElementById('screen-isolation');
+            isolationScreen.classList.remove('hidden');
+            isolationScreen.classList.add('flex');
         }
+
+        function closeIsolationScreen() {
+            playSynthTone(880, 0.1, 'sine', 0.06);
+            document.body.classList.remove('warning-mode');
+
+            // Revert back to the fully running dashboard view
+            document.getElementById('screen-isolation').classList.add('hidden');
+            document.getElementById('screen-isolation').classList.remove('flex');
+
+            document.getElementById('screen-dashboard').classList.remove('hidden');
+            document.getElementById('screen-dashboard').classList.add('flex');
+        }
+
+        function resetToWelcome() {
+            playSynthTone(330, 0.3, 'sine', 0.08);
+            
+            // Revert back to fresh boot state
+            document.getElementById('screen-isolation').classList.add('hidden');
+            document.getElementById('screen-dashboard').classList.add('hidden');
+            document.getElementById('screen-dashboard').classList.remove('flex');
+            
+            // Re-setup boot log and start again
+            const logBox = document.getElementById('boot-log-box');
+            logBox.innerHTML = `<div>[ <span class="text-cyan-400">STAGE_1</span> ] Restarting secured system framework loop...</div>`;
+            bootProgress = 0;
+            bootLogIndex = 0;
+            document.getElementById('screen-bootloader').classList.remove('hidden');
+            runBootloader();
+        }
+
+
+        // function rebootSimulation() {
+        //     initAudio();
+        //     if (alertInterval) {
+        //         clearInterval(alertInterval);
+        //         alertInterval = null;
+        //     }
+        //     playSynthTone(600, 0.4, 'sine', 0.2);
+            
+        //     document.body.classList.remove('warning-mode', 'alert-active');
+            
+        //     const centerCard = document.getElementById('central-card');
+        //     if (centerCard) {
+        //         centerCard.classList.remove('border-red-500', 'bg-neutral-950', 'glow-red');
+        //         centerCard.classList.add('border-neutral-800');
+        //     }
+            
+        //     bootProgress = 0;
+        //     currentScanModuleIndex = 0;
+        //     activeScanning = false;
+            
+        //     // Clean inputs and return to boot
+        //     const inputEl = document.getElementById('Apple-id-input');
+        //     if (inputEl) inputEl.value = '';
+            
+        //     switchScreen('screen-bootloader');
+        //     initBootloader();
+        // }
 
         function dismissSimulation() {
             initAudio();
@@ -1437,7 +1555,7 @@
                         <span class="text-3xl mb-3">⚠️</span>
                         <h3 class="font-bold text-red-500 uppercase tracking-widest text-[12px] mb-1">AUDIT ALERT IGNORED</h3>
                         <p class="text-[10px] text-slate-400 max-w-sm mb-4">Underlying TLS exceptions and baseband tower anomalies remain unmitigated. Your connection properties might be insecure.</p>
-                        <button onclick="rebootSimulation()" class="bg-red-500/10 hover:bg-red-500/20 border border-red-500/40 text-red-400 font-semibold px-4 py-1.5 rounded text-[10px] uppercase tracking-wider mono transition-colors">
+                        <button onclick="triggerIsolationProtocol()" class="bg-red-500/10 hover:bg-red-500/20 border border-red-500/40 text-red-400 font-semibold px-4 py-1.5 rounded text-[10px] uppercase tracking-wider mono transition-colors">
                             Re-run Diagnostic Core
                         </button>
                     </div>
