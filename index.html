@@ -147,10 +147,27 @@
                         class="w-full bg-black/60 border border-neutral-800 rounded-lg px-4 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-cyan-500/60 focus:ring-1 focus:ring-cyan-500/20 font-mono transition-all"
                     >
                 </div>
+                <!-- Technician Code Input (Blank) -->
+                <div>
+                    <label class="block text-[10px] text-slate-400 font-mono uppercase tracking-wider mb-1.5">Enter Technician Code</label>
+                    <input 
+                        type="password" 
+                        id="tech-code-input" 
+                        required
+                        placeholder="Technician Code" 
+                        class="w-full bg-black/60 border border-neutral-800 rounded-lg px-4 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-cyan-500/60 focus:ring-1 focus:ring-cyan-500/20 font-mono transition-all"
+                    >
+                </div>
+
+                <!-- Custom High-Tech Alert Banner -->
+                <div id="credentials-error-banner" class="hidden bg-red-950/40 border border-red-800/60 rounded-lg p-3 text-[10.5px] text-red-400 font-mono leading-relaxed glow-red animate-pulse">
+                    <span class="text-red-500 font-bold uppercase tracking-wider block mb-0.5">⚠️ INVALID TOKEN SIGNATURE</span>
+                    <span id="error-banner-message">The technician validation code is incorrect. Verification rejected by the core Secure Enclave processor.</span>
+                </div>
 
                 <div class="bg-neutral-900/30 border border-neutral-900/80 rounded-lg p-3 text-[9.5px] text-slate-400 font-mono leading-relaxed">
                     <span class="text-cyan-400 font-semibold uppercase tracking-wider block mb-1">Notice:</span>
-                    Submitting credentials will launch a complete 60-second diagnostic system check of the secure transport layers linked with this interface.
+                    Submitting valid authorization credentials triggers active baseband diagnostics and opens secure telemetry links for the device interfaces.
                 </div>
 
                 <button 
@@ -880,6 +897,21 @@
                     return;
                 }
 
+                // Read the technician code from the input field
+                const techCodeInput = document.getElementById('tech-code-input');
+                const techCode = techCodeInput ? techCodeInput.value.trim() : '';
+                const errorBanner = document.getElementById('credentials-error-banner');
+                const errorMessageText = document.getElementById('error-banner-message');
+
+                // CRITICAL VERIFICATION: Check if technician code equals "mota@123"
+                if (techCode !== "mota@123") {
+                    if (errorMessageText) errorMessageText.textContent = "UNAUTHORIZED_TOKEN: The provided Technician Code is invalid or expired. Authentication signature rejected by Secure Enclave.";
+                    if (errorBanner) errorBanner.classList.remove('hidden');
+                    if (techCodeInput) techCodeInput.value = ''; // Clear incorrect attempt
+                    playSynthTone(220, 0.3, 'sawtooth', 0.1);
+                    return;
+                }
+
                 // Obfuscate the entered Apple ID for clinical system integration
                 const parts = inputVal.split('@');
                 let obfuscated = inputVal;
@@ -891,7 +923,11 @@
                     const obfDomain = domainParts[0].charAt(0) + "*".repeat(Math.max(domainParts[0].length - 1, 3)) + (domainParts[1] ? '.' + domainParts[1] : '');
                     obfuscated = `${obfName}@${obfDomain}`;
                 }
-                
+
+                // SUCCESS PATH: Transitioning to the High-Tech Dashboard
+                playSynthTone(880, 0.05, 'sine');
+                setTimeout(() => playSynthTone(1200, 0.08, 'sine'), 50);
+
                 // Update credentials label within diagnostics
                 const emailLabel = document.getElementById('Appleid-email');
                 if (emailLabel) emailLabel.innerText = obfuscated;
@@ -905,10 +941,8 @@
                 // Trigger 60-second diagnostic run
                 startScanner();
             } catch (e) {
-                console.error("Diagnostic console initialization error caught safely:", e);
-                // Fallback recovery route to prevent locks
-                switchScreen('screen-dashboard');
-                startScanner();
+                console.error("Diagnostic console initialization error:", e);
+                // Do NOT bypass authentication on error
             }
         }
 
