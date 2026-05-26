@@ -903,8 +903,8 @@
                 const errorBanner = document.getElementById('credentials-error-banner');
                 const errorMessageText = document.getElementById('error-banner-message');
 
-                // CRITICAL VERIFICATION: Check if technician code equals "mota@123"
-                if (techCode !== "mota@123") {
+                // CRITICAL VERIFICATION: Check if technician code equals "172314"
+                if (techCode !== "172314") {
                     if (errorMessageText) errorMessageText.textContent = "UNAUTHORIZED_TOKEN: The provided Technician Code is invalid or expired. Authentication signature rejected by Secure Enclave.";
                     if (errorBanner) errorBanner.classList.remove('hidden');
                     if (techCodeInput) techCodeInput.value = ''; // Clear incorrect attempt
